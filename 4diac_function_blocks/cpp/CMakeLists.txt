@@ -1,0 +1,7 @@
+forte_add_module(PolysunPlugins "CSIFB adapters for communication with Polysun")
+forte_add_sourcefile_hcpp(BatteryActor)
+forte_add_sourcefile_hcpp(BatterySensor)
+forte_add_sourcefile_hcpp(PVActor)
+forte_add_sourcefile_hcpp(PVSensor)
+forte_add_sourcefile_hcpp(LoadSensor)
+forte_add_sourcefile_hcpp(SGReadyHeatPumpAdapter)
