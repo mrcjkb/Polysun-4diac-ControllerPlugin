@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="ForteActorSensorPlugin" default="build" basedir=".">
+	<description>
+		Builds the open source FORTE actor/sensor Polysun plugin.
+	</description>
+
+	<property name="applicationName" value="Polysun" />
+	<property name="companyName" value="Vela Solaris AG" />
+	<property name="companyUrl" value="velasolaris.com" />
+	<property name="interfaces.path" value="../../Interfaces/Plugins" />
+
+	<path id="classpath">
+		<pathelement path="${interfaces.path}/target/build" />
+		<fileset dir="${interfaces.path}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<path id="classpath.junit">
+		<fileset dir="${interfaces.path}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+
+	<target name="build" depends="jar, junit" description="Main build target"/>
+
+	<target name="clean">
+		<delete dir="target/build" failonerror="false" />
+		<delete dir="target/dist" failonerror="false" />
+		<delete dir="target/junit" failonerror="false" />
+	</target>
+
+	<target name="compile" description="Compiles the plugin">
+		<mkdir dir="target/build" />
+		<javac srcdir="src/main/java" destdir="target/build" includeantruntime="false" target="1.7" source="1.7" encoding="Cp1252" fork="true" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="classpath" />
+		</javac>
+		<copy todir="target/build">
+			<fileset dir="src/main/resources" />
+		</copy>
+	</target>
+
+	<target name="compile.junit" description="Compiles JUnit tests">
+		<javac srcdir="src/test/java" destdir="target/build" includeantruntime="false" target="1.7" source="1.7" encoding="Cp1252" fork="true" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="classpath" />
+			<classpath refid="classpath.junit" />
+		</javac>
+		<copy todir="target/build">
+			<fileset dir="src/test/resources" />
+		</copy>
+	</target>
+
+	<target name="junit" depends="compile, compile.junit">
+		<mkdir dir="target/junit" />
+		<junit printsummary="yes" haltonfailure="yes" haltonerror="yes">
+			<classpath refid="classpath" />
+			<classpath refid="classpath.junit" />
+			<classpath location="target/build" />
+
+			<formatter type="xml" />
+			<formatter type="plain" />
+
+			<batchtest fork="yes" todir="target/junit">
+				<fileset dir="src/test/java">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="jar" depends="clean, compile">
+		<mkdir dir="target/dist" />
+		<jar destfile="target/dist/${ant.project.name}.jar" basedir="target/build">
+			<manifest>
+				<attribute name="Product" value="${applicationName}" />
+				<attribute name="Company" value="${companyName}" />
+				<attribute name="Website" value="${companyUrl}" />
+			</manifest>
+		</jar>
+		<zip destfile="target/dist/${ant.project.name}_src.zip" basedir="src/main/java" includes="**/*.java" />
+	</target>
+
+	<target name="listPluginControllers" depends="clean, jar" description="List plugin controllers from classpath">
+		<java classname="com.velasolaris.plugin.controller.PluginControllerService" classpath="${interfaces.path}/target/dist/PolysunPluginInterfaces.jar;target/dist/${ant.project.name}.jar" />
+	</target>
+
+</project>
