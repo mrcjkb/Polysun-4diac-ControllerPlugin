@@ -1,0 +1,4 @@
+How to install this project to the local repository as maven project
+--------------------------------------------------------------------
+
+# mvn install

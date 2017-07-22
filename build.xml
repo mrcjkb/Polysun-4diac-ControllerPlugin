@@ -7,7 +7,7 @@
 	<property name="applicationName" value="Polysun" />
 	<property name="companyName" value="Vela Solaris AG" />
 	<property name="companyUrl" value="velasolaris.com" />
-	<property name="interfaces.path" value="../../Interfaces/Plugins" />
+	<property name="interfaces.path" value="Interfaces/Plugins" />
 
 	<path id="classpath">
 		<pathelement path="${interfaces.path}/target/build" />
