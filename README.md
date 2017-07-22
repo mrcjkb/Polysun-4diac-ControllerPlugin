@@ -1,3 +1,5 @@
+
+
 # Polysun-4diac-ControllerPlugin
 Open source Polysun plugin with a set of plugin controllers that can be used for communication in co-simulations with IEC 61499 applications running on 4diac-RTE (FORTE).
 
@@ -22,7 +24,7 @@ Requirements for development:
 
   - Polysun Plugin Development Kit (comes with Polysun, see http://www.velasolaris.com/files/tutorial_en.pdf)
   - JDK 7 or higher (http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html)
-  - ant (http://ant.apache.org/bindownload.cgi)
+  - Ant (http://ant.apache.org/bindownload.cgi)
 
 Recommended for development:
 
@@ -31,6 +33,7 @@ Recommended for development:
 The Eclipse project can be imported with File > Import... > Existing projects into Workspace.  
 A javadoc can be found in this project's ..\doc subdirectory.
 
+To build the project, run build.xml as an Ant script. In order for the JUnit tests to be passed (required for a successful build), PolysunPluginTests.sys must be loaded into 4diac and deployed to FORTE (Alternatively, the tests "ForteDataBufferLayerTest" and "CommFunctionBlockLayerTest" can be disabled by adding @Ignore to the tests.
 
 
 NOTE: There is currently a bug in Polysun preventing the correct plugin icon from being loaded. This is not a severe issue, as the default plugin icon is loaded instead.
