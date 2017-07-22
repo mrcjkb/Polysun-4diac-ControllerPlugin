@@ -41,6 +41,10 @@ public class BatteryActorTest {
 	private static final String HOST_KEY = "Host name";
 	/** Key for the port parameter. */
 	private static final String PORT_KEY = "Port number";
+	/** Key for the option to wait for a response from FORTE or not */
+	protected static final String WAITFORRSP_KEY = "Wait for response";
+	/** Integer indicating not to wait for a response from FORTE */
+	protected static final int DONTWAITFORRSP = 0;
 	/** Precision for assertions of double/float data */
 	private static double PRECISION = 0.000001;
 	private static final String CSIGNAL1 = "Set charging power";
@@ -59,12 +63,13 @@ public class BatteryActorTest {
 	 * object must correspond to the configuration by
 	 * {@link BatterySensorController#getConfiguration(Map)}.
 	 */
-	private PolysunSettings createPolysunSettings(String host, int port,
+	private PolysunSettings createPolysunSettings(String host, int port, int waitForRsp, 
 			int timestampSetting, boolean controlChargingpower, boolean controlControlmode) {
 		List<PropertyValue> properties = new ArrayList<>();
 		// Host name and port number
 		properties.add(new PropertyValue(HOST_KEY, host));
 		properties.add(new PropertyValue(PORT_KEY, port, "")); // Port number
+		properties.add(new PropertyValue(WAITFORRSP_KEY, waitForRsp, ""));
 		
 		List<Sensor> sensors = new ArrayList<>();
 		
@@ -81,7 +86,7 @@ public class BatteryActorTest {
 	 * Calls the default Polysun settings configuration (wit time stamp sending enabled)
 	 */
 	private PolysunSettings createPolysunSettingsDefaultConfiguration() {
-		return createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, 0, true, true);
+		return createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, 0, true, true);
 	}
 
 	/**
@@ -105,7 +110,10 @@ public class BatteryActorTest {
 		}
 		
 		List<Sensor> sensors = new ArrayList<>();
-
+		for (Sensor sensor : configuration.getSensors()) {
+			sensors.add(new Sensor(sensor.getName(), sensor.getUnit(), sensor.isAnalog(), sensor.isRequired()));
+		}
+		
 		List<ControlSignal> controlSignals = new ArrayList<>();
 		for (ControlSignal controlSignal : configuration.getControlSignals()) {
 			controlSignals.add(new ControlSignal(controlSignal.getName(), controlSignal.getUnit(),
@@ -139,7 +147,7 @@ public class BatteryActorTest {
 	@Test
 	public void testGetConfiguration() throws PluginControllerException {
 		PluginControllerConfiguration configuration = controller.getConfiguration(null);
-		assertEquals("Wrong number of configured properties", 2, configuration.getProperties().size());
+		assertEquals("Wrong number of configured properties", 3, configuration.getProperties().size());
 		assertEquals("Wrong number of generic properties", 0, configuration.getNumGenericProperties());
 		assertEquals("Wrong number of configured sensors", 0, configuration.getSensors().size());
 		assertEquals("Wrong number of generic sensors", 0, configuration.getNumGenericSensors());
@@ -164,11 +172,11 @@ public class BatteryActorTest {
 	public void testGetControlSignalsToHide() {
 		int state = 1;
 		List<String> controlSignalsToHide = controller.getControlSignalsToHide(
-				createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, state, true, true), null);
+				createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, state, true, true), null);
 		assertEquals("No signals to hide expected", new ArrayList<String>(), controlSignalsToHide);
 		state = 0;
 		controlSignalsToHide = controller.getControlSignalsToHide(
-				createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, state, true, true), null);
+				createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, state, true, true), null);
 		assertEquals("No signals to hide expected", new ArrayList<String>(), controlSignalsToHide);
 	}
 
@@ -181,23 +189,23 @@ public class BatteryActorTest {
 	public void testGetPropertiesToHide() {
 		int state = 1;
 		List<String> propertiesToHide = controller
-				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, state, true, true), null);
-		assertEquals("Wrong number of propreties to hide", 0, propertiesToHide.size());
+				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, state, true, true), null);
+		assertEquals("Wrong number of propreties to hide", 1, propertiesToHide.size());
 		state = 0;
 		propertiesToHide = controller
-				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, state, true, true), null);
-		assertEquals("Wrong number of propreties to hide", 0, propertiesToHide.size());
+				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, state, true, true), null);
+		assertEquals("Wrong number of propreties to hide", 1, propertiesToHide.size());
 	}
 
 	@Test
 	public void testGetSensorsToHide() {
 		int state = 1;
 		List<String> sensorsToHide = controller
-				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, state, true, true), null);
+				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, state, true, true), null);
 		assertEquals("Wrong number of sensors to hide", 0, sensorsToHide.size());
 		state = 0;
 		sensorsToHide = controller
-				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, state, true, true), null);
+				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, state, true, true), null);
 		assertEquals("No sensors to hide expected", 0, sensorsToHide.size());
 	}
 
@@ -230,7 +238,7 @@ public class BatteryActorTest {
 		float[] controlSignals = new float[2];
 		float[] logValues = new float[3];
 		int simulationTime = 0;
-		controller.build(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, 0, true, true), null);
+		controller.build(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, 0, true, true), null);
 		echo.start();
 		Thread.sleep(THREAD_SLEEP_TIME); // Give echo time to open connection
 		controller.initialiseSimulation(null);

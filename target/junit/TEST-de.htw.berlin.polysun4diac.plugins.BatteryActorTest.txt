@@ -1,10 +1,10 @@
 Testsuite: de.htw.berlin.polysun4diac.plugins.BatteryActorTest
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.094 sec
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.116 sec
 
-Testcase: testPolysunSettingsGetter took 0.017 sec
+Testcase: testPolysunSettingsGetter took 0.016 sec
 Testcase: testGetControlSignalsToHide took 0.001 sec
 Testcase: testGetName took 0 sec
-Testcase: testGetConfiguration took 0.003 sec
+Testcase: testGetConfiguration took 0.006 sec
 Testcase: testControl took 1.005 sec
-Testcase: testGetSensorsToHide took 0 sec
-Testcase: testGetPropertiesToHide took 0.001 sec
+Testcase: testGetSensorsToHide took 0.001 sec
+Testcase: testGetPropertiesToHide took 0 sec

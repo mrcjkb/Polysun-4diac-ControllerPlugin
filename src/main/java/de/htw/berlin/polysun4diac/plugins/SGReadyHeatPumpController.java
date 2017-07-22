@@ -168,7 +168,7 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 	
 	@Override
 	public List<String> getControlSignalsToHide(PolysunSettings propertyValues, Map<String, Object> parameters) {
-		List<String> controlSignalsToHide = new ArrayList<>();
+		List<String> controlSignalsToHide = super.getControlSignalsToHide(propertyValues, parameters);
 		// Show heating element sensor only if one of the SG Ready control modes uses an auxiliary heater.
 		PropertyValue property3 = propertyValues.getPropertyValue(HEATING_ELEMENT3_KEY);
 		PropertyValue property4 = propertyValues.getPropertyValue(HEATING_ELEMENT4_KEY);

@@ -15,7 +15,9 @@ import java.util.Map;
 import com.velasolaris.plugin.controller.spi.AbstractPluginController;
 import com.velasolaris.plugin.controller.spi.PluginControllerException;
 import com.velasolaris.plugin.controller.spi.PolysunSettings;
+import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.ControlSignal;
 import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Property;
+import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Sensor;
 import com.velasolaris.plugin.controller.spi.PolysunSettings.PropertyValue;
 
 import de.htw.berlin.polysun4diac.forte.datatypes.DateAndTime;
@@ -31,15 +33,23 @@ import de.htw.berlin.polysun4diac.forte.datatypes.DateAndTime;
 public abstract class Abstract4diacPluginController extends AbstractPluginController {
 
 	/** Key for the host parameter. */
-	private static final String HOST_KEY = "Host name";
+	protected static final String HOST_KEY = "Host name";
 	/** Key for the port parameter. */
-	private static final String PORT_KEY = "Port number";
+	protected static final String PORT_KEY = "Port number";
 	/** Key for the timestamp option. */
-	private static final String TIMESTAMPSETTING_KEY = "Send time stamp";
+	protected static final String TIMESTAMPSETTING_KEY = "Send time stamp";
 	/** Key for the simulation start time specification. */
-	private static final String SIMULATIONSTART_KEY = "Beginning of simulation";
+	protected static final String SIMULATIONSTART_KEY = "Beginning of simulation";
+	/** Key for the property specifying the IEC 61499 service type. */
+	protected static final String SERVICETYPE_KEY = "Communication service type";
+	/** Tool tip for {@link #SERVICETYPE_KEY} */
+	protected static final String SERVICETYPE_TOOLTIP = "The communication service interface function block that this plugin represents.";
+	/** Index of the CLIENT service type in the {@link #SERVICETYPE_KEY} property. */
+	protected static final int CLIENT_IDX = 0;
+	/** Index of the SERVER service type in the {@link #SERVICETYPE_KEY} property. */
+	protected static final int SERVER_IDX = 1;
 	/** Index for disabled sending of time stamp. */
-	private static final int DISABLE_TIMESTAMP = 0;
+	protected static final int DISABLE_TIMESTAMP = 0;
 	
 	/**
 	 * Initialised to true by default.
@@ -61,6 +71,7 @@ public abstract class Abstract4diacPluginController extends AbstractPluginContro
 	
 	@Override
 	public void initialiseSimulation(Map<String, Object> parameters) throws PluginControllerException {
+		super.initialiseSimulation(parameters);
 		if (isConnected()) {
 			// Disconnect if a previous connection was left open due to an exception that could not be caught by the PluginController
 			disconnect();
@@ -85,7 +96,7 @@ public abstract class Abstract4diacPluginController extends AbstractPluginContro
 	
 	@Override
 	public List<String> getPropertiesToHide(PolysunSettings propertyValues, Map<String, Object> parameters) {
-		List<String> propertiesToHide = new ArrayList<>();
+		List<String> propertiesToHide = super.getPropertiesToHide(propertyValues, parameters);
 		if (sendTimestamp()) {
 			// Show simulation start box only if sending time stamp is enabled.
 			PropertyValue property = propertyValues.getPropertyValue(TIMESTAMPSETTING_KEY);
@@ -147,9 +158,35 @@ public abstract class Abstract4diacPluginController extends AbstractPluginContro
 	protected abstract void disconnect();
 	
 	/**
-	 * @return true if this plugin is connected to 4diac, false otherwise.
+	 * @return <code>true</code> if this plugin is connected to 4diac, <code>false</code> otherwise.
 	 */
 	protected abstract boolean isConnected();
+	
+	/**
+	 * @return <code>true</code> if any control signals are used, <code>false</code> otherwise.
+	 */
+	protected boolean isAnyControlSignalUsed() {
+		List<ControlSignal> controlSignals = getControlSignals();
+		for (ControlSignal c : controlSignals) {
+			if (c.isUsed()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * @return <code>true</code> if any sensors are used, <code>false</code> otherwise.
+	 */
+	protected boolean isAnySensorUsed() {
+		List<Sensor> sensors = getSensors();
+		for (Sensor s : sensors) {
+			if (s.isUsed()) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	/** 
 	 * Sets a flag indicating whether to send the time stamp to FORTE.

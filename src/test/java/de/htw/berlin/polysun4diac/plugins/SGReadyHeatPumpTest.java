@@ -60,6 +60,10 @@ public class SGReadyHeatPumpTest {
 	private static final String HEATING_ELEMENT4_KEY = "SG Ready mode 4 with heating element";
 	/** Key for the property specifying the temperature hysteresis in K below which the heat pump switches back from forced normal operation to control mode 3 or 4 */
 	private static final String TEMP_HYSTERESIS_KEY = "Temperature hysteresis";
+	/** Key for the option to wait for a response from FORTE or not */
+	protected static final String WAITFORRSP_KEY = "Wait for response";
+	/** Integer indicating not to wait for a response from FORTE */
+	protected static final int DONTWAITFORRSP = 0;
 	/** Default value for {@link #TEMP_HYSTERESIS_KEY} */
 	private static final float DEF_TEMP_HYSTERESIS = 5;
 	/** Integer representing the setting with a heating element for SG Ready modes 3 and 4. */
@@ -138,11 +142,12 @@ public class SGReadyHeatPumpTest {
 	 * object must correspond to the configuration by
 	 * {@link BatterySensorController#getConfiguration(Map)}.
 	 */
-	private PolysunSettings createPolysunSettings(String host, int port, float lowTempThreshold, int lowHeater, 
+	private PolysunSettings createPolysunSettings(String host, int port, int waitForRsp, float lowTempThreshold, int lowHeater, 
 			float highTempThreshold, int highHeater, float tempHysteresis) {
 		List<PropertyValue> properties = new ArrayList<>();
 		properties.add(new PropertyValue(HOST_KEY, host));
 		properties.add(new PropertyValue(PORT_KEY, port, ""));
+		properties.add(new PropertyValue(WAITFORRSP_KEY, waitForRsp, ""));
 		properties.add(new PropertyValue(TEMP_THRESHOLD3_KEY, lowTempThreshold, "°C"));
 		properties.add(new PropertyValue(HEATING_ELEMENT3_KEY, lowHeater, ""));
 		properties.add(new PropertyValue(TEMP_THRESHOLD4_KEY, highTempThreshold, "°C"));
@@ -166,7 +171,7 @@ public class SGReadyHeatPumpTest {
 	 * Calls the default Polysun settings configuration (wit time stamp sending enabled)
 	 */
 	private PolysunSettings createPolysunSettingsDefaultConfiguration() {
-		return createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], HAS_NO_HEATING_ELEMENT,
+		return createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], HAS_NO_HEATING_ELEMENT,
 				DEF_TEMP_THRESHOLDS[1], HAS_HEATING_ELEMENT, DEF_TEMP_HYSTERESIS);
 	}
 
@@ -300,7 +305,7 @@ public class SGReadyHeatPumpTest {
 	@Test
 	public void testGetConfiguration() throws PluginControllerException {
 		PluginControllerConfiguration configuration = controller.getConfiguration(null);
-		assertEquals("Wrong number of configured properties", 7, configuration.getProperties().size());
+		assertEquals("Wrong number of configured properties", 8, configuration.getProperties().size());
 		assertEquals("Wrong number of generic properties", 0, configuration.getNumGenericProperties());
 		assertEquals("Wrong number of configured sensors", 1, configuration.getSensors().size());
 		assertEquals("Wrong number of generic sensors", 0, configuration.getNumGenericSensors());
@@ -326,25 +331,25 @@ public class SGReadyHeatPumpTest {
 		int stateLow = HAS_HEATING_ELEMENT;
 		int stateHigh = HAS_HEATING_ELEMENT;
 		List<String> controlSignalsToHide = controller
-				.getControlSignalsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getControlSignalsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of control signals to hide", 0, controlSignalsToHide.size());
 		stateLow = HAS_HEATING_ELEMENT;
 		stateHigh = HAS_NO_HEATING_ELEMENT;
 		controlSignalsToHide = controller
-				.getControlSignalsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getControlSignalsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of control signals to hide", 0, controlSignalsToHide.size());
 		stateLow = HAS_NO_HEATING_ELEMENT;
 		stateHigh = HAS_HEATING_ELEMENT;
 		controlSignalsToHide = controller
-				.getControlSignalsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getControlSignalsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of control signals to hide", 0, controlSignalsToHide.size());
 		stateLow = HAS_NO_HEATING_ELEMENT;
 		stateHigh = HAS_NO_HEATING_ELEMENT;
 		controlSignalsToHide = controller
-				.getControlSignalsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getControlSignalsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of control signals to hide", 1, controlSignalsToHide.size());
 	}
@@ -359,25 +364,25 @@ public class SGReadyHeatPumpTest {
 		int stateLow = HAS_HEATING_ELEMENT;
 		int stateHigh = HAS_HEATING_ELEMENT;
 		List<String> propertiesToHide = controller
-				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of propreties to hide", 0, propertiesToHide.size());
 		stateLow = HAS_HEATING_ELEMENT;
 		stateHigh = HAS_NO_HEATING_ELEMENT;
 		propertiesToHide = controller
-				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of propreties to hide", 0, propertiesToHide.size());
 		stateLow = HAS_NO_HEATING_ELEMENT;
 		stateHigh = HAS_HEATING_ELEMENT;
 		propertiesToHide = controller
-				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of propreties to hide", 0, propertiesToHide.size());
 		stateLow = HAS_NO_HEATING_ELEMENT;
 		stateHigh = HAS_NO_HEATING_ELEMENT;
 		propertiesToHide = controller
-				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getPropertiesToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of propreties to hide", 0, propertiesToHide.size());
 	}
@@ -387,25 +392,25 @@ public class SGReadyHeatPumpTest {
 		int stateLow = HAS_HEATING_ELEMENT;
 		int stateHigh = HAS_HEATING_ELEMENT;
 		List<String> sensorsToHide = controller
-				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of sensors to hide", 0, sensorsToHide.size());
 		stateLow = HAS_HEATING_ELEMENT;
 		stateHigh = 1;
 		sensorsToHide = controller
-				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of sensors to hide", 0, sensorsToHide.size());
 		stateLow = 1;
 		stateHigh = HAS_HEATING_ELEMENT;
 		sensorsToHide = controller
-				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of sensors to hide", 0, sensorsToHide.size());
 		stateLow = HAS_NO_HEATING_ELEMENT;
 		stateHigh = HAS_NO_HEATING_ELEMENT;
 		sensorsToHide = controller
-				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], stateLow,
+				.getSensorsToHide(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], stateLow,
 						DEF_TEMP_THRESHOLDS[1], stateHigh, DEF_TEMP_HYSTERESIS), null);
 		assertEquals("Wrong number of sensors to hide", 0, sensorsToHide.size());
 	}
@@ -643,7 +648,7 @@ public class SGReadyHeatPumpTest {
 		int simulationTime = 0;
 		// Test AMPLIFIED control mode.
 		setEchoSensors(false, true);
-		controller.build(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], HAS_HEATING_ELEMENT,
+		controller.build(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], HAS_HEATING_ELEMENT,
 				DEF_TEMP_THRESHOLDS[1], HAS_HEATING_ELEMENT, DEF_TEMP_HYSTERESIS), null);
 		echo.start();
 		Thread.sleep(THREAD_SLEEP_TIME); // Give echo time to open connection
@@ -664,7 +669,7 @@ public class SGReadyHeatPumpTest {
 		int simulationTime = 0;
 		// Test ONMAX control mode.
 		setEchoSensors(false, true);
-		controller.build(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DEF_TEMP_THRESHOLDS[0], HAS_NO_HEATING_ELEMENT,
+		controller.build(createPolysunSettings(DEF_TCP_ADDRESS, DEF_PORT_NUMBER, DONTWAITFORRSP, DEF_TEMP_THRESHOLDS[0], HAS_NO_HEATING_ELEMENT,
 				DEF_TEMP_THRESHOLDS[1], HAS_NO_HEATING_ELEMENT, DEF_TEMP_HYSTERESIS), null);
 		echo.start();
 		Thread.sleep(200); // Give echo time to open connection

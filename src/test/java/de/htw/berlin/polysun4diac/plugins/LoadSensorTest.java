@@ -121,6 +121,10 @@ public class LoadSensorTest {
 		}
 
 		List<ControlSignal> controlSignals = new ArrayList<>();
+		for (ControlSignal controlSignal : configuration.getControlSignals()) {
+			controlSignals.add(new ControlSignal(controlSignal.getName(), controlSignal.getUnit(),
+					controlSignal.isAnalog(), controlSignal.isRequired()));
+		}
 		
 		List<Log> logs = new ArrayList<>();
 		for (Log log : configuration.getLogs()) {

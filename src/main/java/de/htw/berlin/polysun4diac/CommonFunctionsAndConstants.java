@@ -31,6 +31,10 @@ public class CommonFunctionsAndConstants {
 	public static final int DEF_PORT_NUMBER = 61499;
 	/** Sleep time in ms for Threads in JUnit tests. */
 	public static final int THREAD_SLEEP_TIME = 1000;
+	/** Maximum number of generic control signals */
+	public static final int MAX_NUM_GENERIC_SENSORS = 5;
+	/** Maximum number of generic control signals */
+	public static final int MAX_NUM_GENERIC_SIGNALS = 5;
 
 	/**
 	 * Attempts to load the custom 4diac plugin icon.

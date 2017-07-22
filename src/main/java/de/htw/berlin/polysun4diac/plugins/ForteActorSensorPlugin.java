@@ -24,6 +24,9 @@ public class ForteActorSensorPlugin extends AbstractControllerPlugin {
 		controllers.add(PVSensorController.class);
 		controllers.add(PVActorController.class);
 		controllers.add(SGReadyHeatPumpController.class);
+		controllers.add(GenericActorController.class);
+		controllers.add(GenericSensorController.class);
+		controllers.add(GenericForteController.class);
 		return controllers;
 	}
 

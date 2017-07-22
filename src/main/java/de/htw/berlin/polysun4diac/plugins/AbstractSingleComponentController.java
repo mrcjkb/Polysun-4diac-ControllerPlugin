@@ -1,8 +1,10 @@
 package de.htw.berlin.polysun4diac.plugins;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.velasolaris.plugin.controller.spi.PluginControllerException;
+import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Property;
 
 import de.htw.berlin.polysun4diac.forte.comm.CommLayerParams;
 import de.htw.berlin.polysun4diac.forte.comm.IForteSocket;
@@ -17,6 +19,11 @@ import de.htw.berlin.polysun4diac.forte.comm.IForteSocket;
  * @see com.velasolaris.plugin.controller.spi.IPluginController
  */
 public abstract class AbstractSingleComponentController extends Abstract4diacPluginController {
+	
+	/** Key for the option to wait for a response from FORTE or not */
+	protected static final String WAITFORRSP_KEY = "Wait for response";
+	/** Integer indicating not to wait for a response from FORTE */
+	protected static final int DONTWAITFORRSP = 0;
 	
 	/** Socket for communicating with FORTE */
 	private IForteSocket mSocket;
@@ -43,6 +50,13 @@ public abstract class AbstractSingleComponentController extends Abstract4diacPlu
 			return false;
 		}
 		return getSocket().isConnected();
+	}
+	
+	@Override
+	protected List<Property> initialisePropertyList() {
+		List<Property> properties = super.initialisePropertyList();
+		properties.add(new Property(WAITFORRSP_KEY, new String[] { "no" , "yes" }, DONTWAITFORRSP, "If yes is selected, the simulation is paused until a response (RSP) event is received from FORTE."));
+		return properties;
 	}
 	
 	/**
