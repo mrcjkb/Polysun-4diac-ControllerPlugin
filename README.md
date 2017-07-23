@@ -31,7 +31,8 @@ Recommended for development:
   - Eclipse (http://www.eclipse.org/downloads/)
   
 The Eclipse project can be imported with File > Import... > Existing projects into Workspace.  
-A javadoc can be found in this project's ..\docs subdirectory.
+A javadoc can be found in this project's ..\docs subdirectory or online at:
+https://mrcjkb.github.io/Polysun-4diac-ControllerPlugin/ 
 
 To build the project, run build.xml as an Ant script. In order for the JUnit tests to be passed (required for a successful build), PolysunPluginTests.sys must be loaded into 4diac and deployed to FORTE (Alternatively, the tests "ForteDataBufferLayerTest" and "CommFunctionBlockLayerTest" can be disabled by adding @Ignore to the tests.
 
