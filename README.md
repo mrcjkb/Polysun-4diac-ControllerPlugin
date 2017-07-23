@@ -29,7 +29,7 @@ Recommended for development:
   - Eclipse (http://www.eclipse.org/downloads/)
   
 The Eclipse project can be imported with File > Import... > Existing projects into Workspace.  
-A javadoc can be found in this project's ..\doc subdirectory.
+A javadoc can be found in this project's ..\docs subdirectory.
 
 
 
