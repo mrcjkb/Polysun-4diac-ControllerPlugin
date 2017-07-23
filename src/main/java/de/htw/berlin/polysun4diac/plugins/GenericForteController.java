@@ -1,5 +1,5 @@
 package de.htw.berlin.polysun4diac.plugins;
-// MFIXME Debug this
+
 import static de.htw.berlin.polysun4diac.CommonFunctionsAndConstants.*;
 
 import java.io.IOException;
