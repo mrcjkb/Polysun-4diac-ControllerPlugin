@@ -208,9 +208,8 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 	@Override
 	public int[] control(int simulationTime, boolean status, float[] sensors, float[] controlSignals, float[] logValues,
 			boolean preRun, Map<String, Object> parameters) throws PluginControllerException {
-		int[] nextMinute = new int[] {simulationTime + 60}; // Register next minute
 		if (!status) {
-			return nextMinute;
+			return null;
 		}
 		try { // Wait for input from FORTE
 			getSocket().recvData();
@@ -253,7 +252,7 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 		controlSignals[getCSIdx(CSIGNAL1)] = polysunSignals[0];
 		controlSignals[getCSIdx(CSIGNAL2)] = polysunSignals[1];
 		controlSignals[getCSIdx(CSIGNAL3)] = polysunSignals[2];
-		return nextMinute;
+		return null;
 	}
 	
 	/**

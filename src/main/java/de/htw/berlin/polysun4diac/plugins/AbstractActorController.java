@@ -26,9 +26,8 @@ public abstract class AbstractActorController extends AbstractSingleComponentCon
 	@Override
 	public int[] control(int simulationTime, boolean status, float[] sensors, float[] controlSignals, float[] logValues,
 			boolean preRun, Map<String, Object> parameters) throws PluginControllerException {
-		int[] nextMinute = new int[] {simulationTime + 60}; // Register next minute
 		if (!status) {
-			return nextMinute;
+			return null;
 		}
 		try { // Wait for input from FORTE
 			getSocket().recvData();
@@ -40,7 +39,7 @@ public abstract class AbstractActorController extends AbstractSingleComponentCon
 			throw new PluginControllerException("Error receiving response from FORTE CSIFB.", e);
 		}
 		populateControlSignals(controlSignals);
-		return nextMinute;
+		return null;
 	}
 	
 	@Override

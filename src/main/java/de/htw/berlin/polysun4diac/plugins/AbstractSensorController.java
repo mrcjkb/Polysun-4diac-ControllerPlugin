@@ -29,9 +29,8 @@ public abstract class AbstractSensorController extends AbstractSingleComponentCo
 	public int[] control(int simulationTime, boolean status, float[] sensors, float[] controlSignals, float[] logValues,
 			boolean preRun, Map<String, Object> parameters) throws PluginControllerException {
 		try {
-			int[] nextMinute = new int[] {simulationTime + 60}; // Register next minute
 			if (!status) {
-				return nextMinute;
+				return null;
 			}
 			// Buffer inputs
 			putSensors(sensors);
@@ -56,7 +55,7 @@ public abstract class AbstractSensorController extends AbstractSingleComponentCo
 					throw new PluginControllerException("Error receiving response from FORTE CSIFB.", e);
 				} 
 			}
-			return nextMinute;
+			return null;
 		} catch (PluginControllerException e) {
 			// To avoid leaving open connections, disconnect() is called before throwing any exception.
 			disconnect();
