@@ -59,7 +59,7 @@ import de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType;
  * @see de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType
  * @see de.htw.berlin.polysun4diac.forte.datatypes.DateAndTime
  */
-public class ForteDataBufferLayer extends AbstractCommunicationLayer implements IForteSocket, Serializable {
+public class ForteDataBufferLayer extends AbstractDataBufferLayer implements IForteSocket, Serializable {
 	
 	private static final long serialVersionUID = 5303988619865082081L;
 	
@@ -100,19 +100,21 @@ public class ForteDataBufferLayer extends AbstractCommunicationLayer implements 
 		if (!isInitialized()) { // Object has not yet been initialized
 			// --> This is the top layer with the same inputs as outputs.
 			// Initialize with inputs defined in params
-			initialize(params.getInputs(), params.getInputArrayLengths());
+			initialise(params.getInputs(), params.getInputArrayLengths());
 		}
 		return super.openConnection(params);
 	}
 	
 	/**
 	 * Initializes this object's buffer that can hold multiple arrays of various data types
-	 * @param dataTypes List containing the ForteDataType Enums.
+	 * @param dataTypes List containing the ForteDataType enumerations.
 	 * This could be the inputs of outputs set in a CommLayerParams object.
 	 * @param arraySizes List containing the corresponding array sizes (1 for non-arrays)
 	 * This could be the array sizes set in a CommLayerParams object.
+	 * @see ForteDataType
 	 */
-	public void initialize(List<ForteDataType> dataTypes, List<Integer> arraySizes) {
+	@Override
+	public void initialise(List<Enum<?>> dataTypes, List<Integer> arraySizes) {
 		if (dataTypes.size() != arraySizes.size()) {
 			throw new InputMismatchException("The sizes of the inputs do not match.");
 		}
@@ -122,11 +124,11 @@ public class ForteDataBufferLayer extends AbstractCommunicationLayer implements 
 		int numBytes = 0;
 		int ct = 0;
 		mTypes = new ForteDataType[mNumDataValues];
-		Iterator<ForteDataType> dataIt = dataTypes.iterator();
+		Iterator<Enum<?>> dataIt = dataTypes.iterator();
 		Iterator<Integer> arrSizeIt = arraySizes.iterator();
 		while (dataIt.hasNext() && arrSizeIt.hasNext()) {
 			int arrSize = arrSizeIt.next();
-			ForteDataType type = dataIt.next();
+			ForteDataType type = (ForteDataType) dataIt.next();
 			int bytes = type.getNumBytes();
 			if (arrSize > 1) { // Array
 				// 4 elements added for headers + array size (2 bytes) + number of bytes of array data

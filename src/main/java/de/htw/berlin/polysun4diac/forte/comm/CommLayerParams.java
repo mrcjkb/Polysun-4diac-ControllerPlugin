@@ -48,9 +48,9 @@ public class CommLayerParams extends InetSocketAddress {
 	 */
 	private ForteServiceType mServiceType;
 	/** ForteDataType enumerations of the data types to be sent to FORTE */
-	private List<ForteDataType> mInputDataTypes;
+	private List<Enum<?>> mInputDataTypes;
 	/** ForteDataType enumerations of the data types to be received from FORTE */
-	private List<ForteDataType> mOutputDataTypes;
+	private List<Enum<?>> mOutputDataTypes;
 	/** Array lengths of the input data types */
 	private List<Integer> mInputArrayLengths;
 	/** Array lengths of the output data types */
@@ -190,16 +190,16 @@ public class CommLayerParams extends InetSocketAddress {
 	}
 	
 	/**
-	 * @return data types to be sent to FORTE
+	 * @return data types to be sent.
 	 */
-	public List<ForteDataType> getInputs() {
+	public List<Enum<?>> getInputs() {
 		return mInputDataTypes;
 	}
 	
 	/**
-	 * @return data types to be received from FORTE
+	 * @return data types to be received.
 	 */
-	public List<ForteDataType> getOutputs() {
+	public List<Enum<?>> getOutputs() {
 		return mOutputDataTypes;
 	}
 	
@@ -244,8 +244,8 @@ public class CommLayerParams extends InetSocketAddress {
 			return false;
 		}
 		for (int i = 0; i < getInputs().size(); i++) {
-			ForteDataType in = getInputs().get(i);
-			ForteDataType out = getOutputs().get(i);
+			Enum<?> in = getInputs().get(i);
+			Enum<?> out = getOutputs().get(i);
 			int inLength = getInputArrayLengths().get(i);
 			int outLength = getOutputArrayLengths().get(i);
 			if (!in.equals(out) || inLength != outLength) {
@@ -256,11 +256,11 @@ public class CommLayerParams extends InetSocketAddress {
 	}
 	
 	/**
-	 * Initializes the lists for initializing FORTE data types with no inputs/outputs.
+	 * Initializes the lists for initializing data types with no inputs/outputs.
 	 */
 	private void initLists() {
-		mInputDataTypes = new ArrayList<ForteDataType>();
-		mOutputDataTypes = new ArrayList<ForteDataType>();
+		mInputDataTypes = new ArrayList<Enum<?>>();
+		mOutputDataTypes = new ArrayList<Enum<?>>();
 		mInputArrayLengths = new ArrayList<Integer>();
 		mOutputArrayLengths = new ArrayList<Integer>();
 		addInput(ForteDataType.NONE, DEFARRAYLENGTH);

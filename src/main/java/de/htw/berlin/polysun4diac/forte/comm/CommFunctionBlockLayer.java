@@ -20,9 +20,9 @@ public class CommFunctionBlockLayer extends AbstractCommunicationLayer implement
 	private static final long serialVersionUID = 1031792403895195015L;
 	
 	/** Output layer for handling data received from FORTE */
-	ForteDataBufferLayer mOutputLayer;
+	AbstractDataBufferLayer mOutputLayer;
 	/** Input layer for handling data that is sent to FORTE */
-	ForteDataBufferLayer mInputLayer;
+	AbstractDataBufferLayer mInputLayer;
 	
 	/**
 	 * This method is intended to allow array-backed buffers to be passed to native code more efficiently.
@@ -362,8 +362,8 @@ public class CommFunctionBlockLayer extends AbstractCommunicationLayer implement
 			setConnectionState(getBelow().openConnection(params));
 			setIntermediateLayerConnectionstate();
 			// Initialize intermediate layers
-			getInputLayer().initialize(params.getInputs(), params.getInputArrayLengths());
-			getOutputLayer().initialize(params.getOutputs(), params.getOutputArrayLengths());
+			getInputLayer().initialise(params.getInputs(), params.getInputArrayLengths());
+			getOutputLayer().initialise(params.getOutputs(), params.getOutputArrayLengths());
 		}
 		return getConnectionState();
 	}
@@ -440,7 +440,7 @@ public class CommFunctionBlockLayer extends AbstractCommunicationLayer implement
 	 * @param output ForteDataBufferLayer for handling data that is received from FORTE.
 	 * @param input ForteDataBufferLayer for handling data that is sent to FORTE.
 	 */
-	private void setBelow(ICommunicationLayer below, ForteDataBufferLayer output, ForteDataBufferLayer input) {
+	private void setBelow(ICommunicationLayer below, AbstractDataBufferLayer output, AbstractDataBufferLayer input) {
 		mOutputLayer = output;
 		mInputLayer = input;
 		mOutputLayer.setBelow(below);;
@@ -448,12 +448,12 @@ public class CommFunctionBlockLayer extends AbstractCommunicationLayer implement
 	}
 	
 	/** returns {@link #mOutputLayer} for handling data that is received from FORTE. */
-	private ForteDataBufferLayer getOutputLayer() {
+	private AbstractDataBufferLayer getOutputLayer() {
 		return mOutputLayer;
 	}
 	
 	/** returns {@link #mInputLayer} for handling data that is sent to FORTE. */
-	private ForteDataBufferLayer getInputLayer() {
+	private AbstractDataBufferLayer getInputLayer() {
 		return mInputLayer;
 	}
 }
