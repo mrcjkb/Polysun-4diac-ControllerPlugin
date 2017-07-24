@@ -493,7 +493,7 @@ public interface IForteSocket {
 	 */
 	public void sendData() throws IOException;
 	
-	/** Sends a response (a single byte with the value of 5 */
+	/** Sends a response (e.g., a single byte with the value of 5) */
 	public void sendRsp() throws IOException;
 	
 	/**
