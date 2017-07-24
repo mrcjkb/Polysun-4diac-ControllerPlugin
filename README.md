@@ -18,6 +18,7 @@ In due time, a detailed documentation shall be linked to here.
 
 This plugin and the communication framework (which can be used for other Java applications, too) are provided as open source under a BSD-3 clause (see LICENCE).
 
+NOTE: The order in which the controllers are called is the same as the order in which they were placed in the Polysun system diagram.
 
 # Development
 Requirements for development:
