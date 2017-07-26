@@ -51,9 +51,19 @@ public class BatterySensorController extends AbstractSensorController {
 	protected void initialiseConnection(String host, int port) throws PluginControllerException {
 		// Default service type of CommLayerParams is client.
 		CommLayerParams params = new CommLayerParams(host, port);
+		int numUsedSensors = ZERO_INIT;
 		// Inputs to send to FORTE
-		params.addInput(ForteDataType.LREAL); // Input 1: SoC
-		params.addInput(ForteDataType.LREAL); // Input 2: Charging power
+		if (getSensor(SENSOR1).isUsed()) {
+			params.addInput(ForteDataType.LREAL); // Input 1: SoC
+			numUsedSensors++;
+		}
+		if (getSensor(SENSOR2).isUsed()) {
+			params.addInput(ForteDataType.LREAL); // Input 2: Charging power
+			numUsedSensors++;
+		}
+		if (numUsedSensors == ZERO_INIT) {
+			throw new PluginControllerException(getName() + ": At least one sensor must be used.");
+		}
 		if (sendTimestamp()) {
 			params.addInput(ForteDataType.DATE_AND_TIME);
 		}

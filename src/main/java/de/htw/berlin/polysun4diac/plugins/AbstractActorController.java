@@ -8,7 +8,7 @@ import com.velasolaris.plugin.controller.spi.PluginControllerException;
 import com.velasolaris.plugin.controller.spi.PolysunSettings;
 
 import de.htw.berlin.polysun4diac.exception.UnsupportedForteDataTypeException;
-// MTODO set service type
+
 /**
  * Defines the default behaviour of a FORTE actor plugin controller for receiving control signals from IEC 61499 applications running on 4diac-RTE (FORTE).
  * @author Marc Jakobi</p>HTW Berlin</p>July 2017

@@ -80,7 +80,7 @@ public class LoadSensorTest {
 		properties.add(new PropertyValue(WAITFORRSP_KEY, waitForRsp, ""));
 		
 		List<Sensor> sensors = new ArrayList<>();
-		sensors.add(new Sensor(SENSOR1, "W", true, false, measuredLoad)); // Sensor 1
+		sensors.add(new Sensor(SENSOR1, "W", true, true, measuredLoad)); // Sensor 1
 		
 		List<ControlSignal> controlSignals = new ArrayList<>();
 		List<Log> logs = new ArrayList<>();

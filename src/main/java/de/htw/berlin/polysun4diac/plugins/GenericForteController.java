@@ -164,6 +164,7 @@ public class GenericForteController extends AbstractSingleComponentController {
 	@Override
 	protected void initialiseConnection(String address, int port) throws PluginControllerException {
 		CommLayerParams params = new CommLayerParams(address, port);
+		int numUsed = ZERO_INIT;
 		switch (getProp(SERVICETYPE_KEY).getInt()) { // Default is CLIENT
 		case SERVER_IDX:
 			params.setServiceType(ForteServiceType.SERVER);
@@ -179,16 +180,23 @@ public class GenericForteController extends AbstractSingleComponentController {
 		for (ControlSignal c : controlSignals) {
 			if (c.isUsed()) {
 				params.addOutput(ForteDataType.REAL);
+				numUsed++;
 			}
 		}
 		List<Sensor> sensors = getSensors();
 		for (Sensor s : sensors) {
 			if (s.isUsed()) {
 				params.addInput(ForteDataType.REAL);
+				numUsed++;
 			}
 		}
 		if (sendTimestamp()) {
 			params.addInput(ForteDataType.DATE_AND_TIME);
+			numUsed++;
+		}
+		if (numUsed == ZERO_INIT) {
+			throw new PluginControllerException(getName() + ": At least one sensor or control signal must be used"
+					+ " or sending the time stamp must be enabled if none is used.");
 		}
 		makeIPSocket(params);
 	}

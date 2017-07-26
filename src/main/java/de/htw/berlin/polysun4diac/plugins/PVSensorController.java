@@ -52,8 +52,18 @@ public class PVSensorController extends AbstractSensorController {
 		// Default service type of CommLayerParams is client.
 		CommLayerParams params = new CommLayerParams(host, port);
 		// Inputs to send to FORTE
-		params.addInput(ForteDataType.LREAL); // Input 1: PV power
-		params.addInput(ForteDataType.LREAL); // Input 2: Feed-in limit
+		int numUsedSensors = ZERO_INIT;
+		if (getSensor(SENSOR1).isUsed()) {
+			params.addInput(ForteDataType.LREAL); // Input 1: PV power
+			numUsedSensors++;
+		}
+		if (getSensor(SENSOR2).isUsed()) {
+			params.addInput(ForteDataType.LREAL); // Input 2: Feed-in limit
+			numUsedSensors++;
+		}
+		if (numUsedSensors == ZERO_INIT) {
+			throw new PluginControllerException(getName() + ": At least one sensor must be used.");
+		}
 		if (sendTimestamp()) {
 			params.addInput(ForteDataType.DATE_AND_TIME);
 		}

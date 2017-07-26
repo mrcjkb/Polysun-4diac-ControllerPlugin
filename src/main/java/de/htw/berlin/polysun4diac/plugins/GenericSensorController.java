@@ -52,13 +52,19 @@ public class GenericSensorController extends AbstractSensorController {
 	protected void initialiseConnection(String address, int port) throws PluginControllerException {
 		CommLayerParams params = new CommLayerParams(address, port);
 		List<Sensor> sensors = getSensors();
+		int numUsedSensors = ZERO_INIT;
 		for (Sensor s : sensors) {
 			if (s.isUsed()) {
 				params.addInput(ForteDataType.REAL);
+				numUsedSensors++;
 			}
 		}
 		if (sendTimestamp()) {
 			params.addInput(ForteDataType.DATE_AND_TIME);
+			numUsedSensors++;
+		}
+		if (numUsedSensors == ZERO_INIT) {
+			throw new PluginControllerException(getName() + ": At least one sensor must be used. If none is used, sending the time stamp must be enabled.");
 		}
 		makeIPSocket(params);
 	}

@@ -41,7 +41,7 @@ public class LoadSensorController extends AbstractSensorController {
 	@Override
 	public PluginControllerConfiguration getConfiguration(Map<String, Object> parameters) {
 		List<Sensor> sensors = new ArrayList<>();
-		sensors.add(new Sensor(SENSOR1, "W", true, false, "The electricity consumption of profiles and/or thermal components."));
+		sensors.add(new Sensor(SENSOR1, "W", true, true, "The electricity consumption of profiles and/or thermal components."));
 		return new PluginControllerConfiguration(initialisePropertyList(), sensors, null, null, 0, 0, 0, getPluginIconResource(), null);
 	}
 	

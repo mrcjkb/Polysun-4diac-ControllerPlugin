@@ -56,10 +56,15 @@ public class GenericActorController extends AbstractActorController {
 	protected void initialiseConnection(String address, int port) throws PluginControllerException {
 		CommLayerParams params = new CommLayerParams(address, port);
 		List<ControlSignal> controlSignals = getControlSignals();
+		int numUsedControlSignals = ZERO_INIT;
 		for (ControlSignal c : controlSignals) {
 			if (c.isUsed()) {
 				params.addOutput(ForteDataType.REAL);
+				numUsedControlSignals++;
 			}
+		}
+		if (numUsedControlSignals == ZERO_INIT) {
+			throw new PluginControllerException(getName() + ": At least one control signal must be used.");
 		}
 		makeIPSocket(params);
 	}
