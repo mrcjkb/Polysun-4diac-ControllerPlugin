@@ -46,7 +46,7 @@ public class GenericActorController extends AbstractActorController {
 	protected void populateControlSignals(float[] controlSignals) throws PluginControllerException {
 		for (int i = 0; i < controlSignals.length; i++) {
 			if (!getSocket().isFloat()) {
-				throw new PluginControllerException("The Generic Actor function block should only send REAL data.");
+				throw new PluginControllerException(getName() + ": The Generic Actor function block should only send REAL data.");
 			}
 			controlSignals[i] = getSocket().getFloat();
 		}

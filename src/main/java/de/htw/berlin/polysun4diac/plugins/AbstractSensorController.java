@@ -41,7 +41,7 @@ public abstract class AbstractSensorController extends AbstractSingleComponentCo
 				}
 				getSocket().sendData();
 			} catch (IOException e) {
-				throw new PluginControllerException("Error sending Polysun data to FORTE.", e);
+				throw new PluginControllerException(getName() + ": Error sending Polysun data to FORTE.", e);
 			}
 			// Wait for response from FORTE if specified so by user.
 			if (getProp(WAITFORRSP_KEY).getInt() != DONTWAITFORRSP) {
@@ -49,10 +49,10 @@ public abstract class AbstractSensorController extends AbstractSingleComponentCo
 					getSocket().recvData();
 				} catch (UnsupportedForteDataTypeException e) {
 					e.printStackTrace();
-					throw new PluginControllerException("Unsupported FORTE data type.", e);
+					throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
 				} catch (IOException e) {
 					e.printStackTrace();
-					throw new PluginControllerException("Error receiving response from FORTE CSIFB.", e);
+					throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
 				} 
 			}
 			return null;

@@ -52,7 +52,7 @@ public class PVActorController extends AbstractActorController {
 		if (getSocket().isDouble()) {
 			controlSignals[getCSIdx(CSIGNAL1)] = (float) getSocket().getDouble();
 		} else {
-			throw new PluginControllerException("The battery actor function block should send LREAL data as a " + CSIGNAL1 + " control signal.");
+			throw new PluginControllerException(getName() + ": The battery actor function block should send LREAL data as a " + CSIGNAL1 + " control signal.");
 		}
 	}
 }

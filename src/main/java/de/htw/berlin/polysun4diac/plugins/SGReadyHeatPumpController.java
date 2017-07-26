@@ -215,10 +215,10 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 			getSocket().recvData();
 		} catch (UnsupportedForteDataTypeException e) {
 			e.printStackTrace();
-			throw new PluginControllerException("Unsupported FORTE data type.", e);
+			throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new PluginControllerException("Error receiving response from FORTE battery CSIFB.", e);
+			throw new PluginControllerException(getName() + ": Error receiving response from FORTE battery CSIFB.", e);
 		}
 		// Read control signals from buffer
 		boolean[] sgReadySignals = new boolean[2];
@@ -226,7 +226,7 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 			if (getSocket().isBool()) {
 				sgReadySignals[i] = getSocket().getBool();
 			} else {
-				throw new PluginControllerException("The battery actor function block should send BOOL data as a " + CSIGNAL1 + " control signal.");
+				throw new PluginControllerException(getName() + ": The battery actor function block should send BOOL data as a " + CSIGNAL1 + " control signal.");
 			}
 		}
 		// Allow OFF operation again if cool down time for disallowing OFF operation has been exceeded.

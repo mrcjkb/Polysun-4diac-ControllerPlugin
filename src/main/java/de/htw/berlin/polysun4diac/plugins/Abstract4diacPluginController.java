@@ -83,7 +83,8 @@ public abstract class Abstract4diacPluginController extends AbstractPluginContro
 //				setForteTimestamp(new DateAndTime(LocalDateTime.parse(getProperty(SIMULATIONSTART_KEY).getString())));
 				setForteTimestamp(new DateAndTime(getProperty(SIMULATIONSTART_KEY).getString()));
 			} catch (ParseException e) {
-				throw new PluginControllerException("The date and time format entered into the plugin controller was not regognised. Please use the format: " + DATEFORMATSTR, e);
+				throw new PluginControllerException(getName() + ": The date and time format entered into the plugin controller was not regognised. "
+						+ "Please use the format: " + DATEFORMATSTR, e);
 			}
 		}
 		initialiseConnection(getProperty(HOST_KEY).getString(), getProperty(PORT_KEY).getInt());

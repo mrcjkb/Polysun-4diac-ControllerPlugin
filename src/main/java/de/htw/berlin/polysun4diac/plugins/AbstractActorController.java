@@ -33,10 +33,10 @@ public abstract class AbstractActorController extends AbstractSingleComponentCon
 			getSocket().recvData();
 		} catch (UnsupportedForteDataTypeException e) {
 			e.printStackTrace();
-			throw new PluginControllerException("Unsupported FORTE data type.", e);
+			throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new PluginControllerException("Error receiving response from FORTE CSIFB.", e);
+			throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
 		}
 		populateControlSignals(controlSignals);
 		return null;

@@ -40,7 +40,7 @@ public abstract class AbstractSingleComponentController extends Abstract4diacPlu
 		try {
 			getSocket().disconnect();
 		} catch (IOException e) {
-			e.printStackTrace();
+			// Ignore. Probably already disconnected.
 		}
 	}
 	
@@ -69,7 +69,7 @@ public abstract class AbstractSingleComponentController extends Abstract4diacPlu
 			setSocket(params.makeIPSocket());
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new PluginControllerException("Unable to connect to FORTE.", e);
+			throw new PluginControllerException(getName() + ": Unable to connect to FORTE.", e);
 		}
 	}
 	

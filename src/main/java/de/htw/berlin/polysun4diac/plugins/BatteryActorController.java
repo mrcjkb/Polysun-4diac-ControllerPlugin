@@ -62,12 +62,12 @@ public class BatteryActorController extends AbstractActorController {
 		if (getSocket().isDouble()) {
 			controlSignals[getCSIdx(CSIGNAL1)] = (float) getSocket().getDouble();
 		} else {
-			throw new PluginControllerException("The battery actor function block should send LREAL data as a " + CSIGNAL1 + " control signal.");
+			throw new PluginControllerException(getName() + ": The battery actor function block should send LREAL data as a " + CSIGNAL1 + " control signal.");
 		}
 		if (getSocket().isBool()) {
 			controlSignals[getCSIdx(CSIGNAL2)] = getSocket().getBool() ? 1.0f : 0.0f;
 		} else {
-			throw new PluginControllerException("The battery actor function block should send BOOL data as a " + CSIGNAL2 + " control signal.");
+			throw new PluginControllerException(getName() + ": The battery actor function block should send BOOL data as a " + CSIGNAL2 + " control signal.");
 		}
 	}
 } 
