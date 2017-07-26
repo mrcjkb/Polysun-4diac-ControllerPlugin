@@ -42,28 +42,34 @@ const SFBInterfaceSpec FORTE_BatteryActor::scm_stFBInterfaceSpec = {
 
 const SCFB_FBInstanceData FORTE_BatteryActor::scm_astInternalFBs[] = {
   {g_nStringIdSERVER_2, g_nStringIdSERVER_2},
+  {g_nStringIdSET_POWER, g_nStringIdLREAL2LREAL},
+  {g_nStringIdCONTROL_MODE, g_nStringIdBOOL2BOOL},
 };
 
 const SCFB_FBConnectionData FORTE_BatteryActor::scm_astEventConnections[] = {
   {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdINIT), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdINIT), 0},
-  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdRSP), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdRSP), 0},
   {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdINITO), 0, GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdINITO), -1},
+  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdRSP), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSET_POWER, g_nStringIdREQ), 1},
+  {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSET_POWER, g_nStringIdCNF), 1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCONTROL_MODE, g_nStringIdREQ), 2},
+  {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCONTROL_MODE, g_nStringIdCNF), 2, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdRSP), 0},
 };
 
 const SCFB_FBConnectionData FORTE_BatteryActor::scm_astDataConnections[] = {
   {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdQI), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdQI), 0},
   {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdID), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdID), 0},
-  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdPSET), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdSD_1), 0},
-  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdCM), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdSD_2), 0},
   {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdQO), 0, GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdQO), -1},
   {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdSTATUS), 0, GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdSTATUS), -1},
+  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdPSET), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSET_POWER, g_nStringIdIN), 1},
+  {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSET_POWER, g_nStringIdOUT), 1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdSD_1), 0},
+  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdCM), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCONTROL_MODE, g_nStringIdIN), 2},
+  {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCONTROL_MODE, g_nStringIdOUT), 2, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_2, g_nStringIdSD_2), 0},
 };
 
 const SCFB_FBNData FORTE_BatteryActor::scm_stFBNData = {
-  1, scm_astInternalFBs,
-  3, scm_astEventConnections,
+  3, scm_astInternalFBs,
+  5, scm_astEventConnections,
   0, 0,
-  6, scm_astDataConnections,
+  8, scm_astDataConnections,
   0, 0,
   0, 0
 };

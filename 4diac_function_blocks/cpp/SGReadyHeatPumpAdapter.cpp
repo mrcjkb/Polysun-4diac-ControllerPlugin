@@ -42,28 +42,34 @@ const SFBInterfaceSpec FORTE_SGReadyHeatPumpAdapter::scm_stFBInterfaceSpec = {
 
 const SCFB_FBInstanceData FORTE_SGReadyHeatPumpAdapter::scm_astInternalFBs[] = {
   {g_nStringIdSERVER_1, g_nStringIdSERVER_2},
+  {g_nStringIdCS1, g_nStringIdBOOL2BOOL},
+  {g_nStringIdCS2, g_nStringIdBOOL2BOOL},
 };
 
 const SCFB_FBConnectionData FORTE_SGReadyHeatPumpAdapter::scm_astEventConnections[] = {
   {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdINIT), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdINIT), 0},
-  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdRSP), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdRSP), 0},
   {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdINITO), 0, GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdINITO), -1},
+  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdRSP), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCS1, g_nStringIdREQ), 1},
+  {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCS1, g_nStringIdCNF), 1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCS2, g_nStringIdREQ), 2},
+  {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCS2, g_nStringIdCNF), 2, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdRSP), 0},
 };
 
 const SCFB_FBConnectionData FORTE_SGReadyHeatPumpAdapter::scm_astDataConnections[] = {
   {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdQI), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdQI), 0},
   {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdID), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdID), 0},
-  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdCS1), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdSD_1), 0},
   {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdQO), 0, GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdQO), -1},
   {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdSTATUS), 0, GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdSTATUS), -1},
-  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdCS2), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdSD_2), 0},
+  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdCS1), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCS1, g_nStringIdIN), 1},
+  {GENERATE_CONNECTION_PORT_ID_1_ARG(g_nStringIdCS2), -1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCS2, g_nStringIdIN), 2},
+  {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCS1, g_nStringIdOUT), 1, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdSD_1), 0},
+  {GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdCS2, g_nStringIdOUT), 2, GENERATE_CONNECTION_PORT_ID_2_ARG(g_nStringIdSERVER_1, g_nStringIdSD_2), 0},
 };
 
 const SCFB_FBNData FORTE_SGReadyHeatPumpAdapter::scm_stFBNData = {
-  1, scm_astInternalFBs,
-  3, scm_astEventConnections,
+  3, scm_astInternalFBs,
+  5, scm_astEventConnections,
   0, 0,
-  6, scm_astDataConnections,
+  8, scm_astDataConnections,
   0, 0,
   0, 0
 };

@@ -33,19 +33,25 @@
     </OutputVars>
   </InterfaceList>
   <FBNetwork>
-    <FB Name="SERVER_2" Type="SERVER_2" x="1520.0" y="665.0"/>
+    <FB Name="SERVER_2" Type="SERVER_2" x="2755.0" y="665.0"/>
+    <FB Name="SET_POWER" Type="LREAL2LREAL" x="1045.0" y="1425.0"/>
+    <FB Name="CONTROL_MODE" Type="BOOL2BOOL" x="1045.0" y="1995.0"/>
     <DataConnections>
       <Connection Destination="SERVER_2.QI" Source="QI" dx1="720.0" dx2="0.0" dy="0.0"/>
       <Connection Destination="SERVER_2.ID" Source="ID" dx1="610.0" dx2="0.0" dy="0.0"/>
-      <Connection Destination="SERVER_2.SD_1" Source="PSET" dx1="500.0" dx2="0.0" dy="0.0"/>
-      <Connection Destination="SERVER_2.SD_2" Source="CM" dx1="375.0" dx2="0.0" dy="0.0"/>
       <Connection Destination="QO" Source="SERVER_2.QO" dx1="175.0" dx2="0.0" dy="0.0"/>
       <Connection Destination="STATUS" Source="SERVER_2.STATUS" dx1="285.0" dx2="0.0" dy="0.0"/>
+      <Connection Destination="SET_POWER.IN" Source="PSET" dx1="0.0" dx2="0.0" dy="0.0"/>
+      <Connection Destination="SERVER_2.SD_1" Source="SET_POWER.OUT" dx1="0.0" dx2="0.0" dy="0.0"/>
+      <Connection Destination="CONTROL_MODE.IN" Source="CM" dx1="0.0" dx2="0.0" dy="0.0"/>
+      <Connection Destination="SERVER_2.SD_2" Source="CONTROL_MODE.OUT" dx1="625.0" dx2="0.0" dy="0.0"/>
     </DataConnections>
     <EventConnections>
       <Connection Destination="SERVER_2.INIT" Source="INIT" dx1="890.0" dx2="0.0" dy="0.0"/>
-      <Connection Destination="SERVER_2.RSP" Source="RSP" dx1="770.0" dx2="0.0" dy="0.0"/>
       <Connection Destination="INITO" Source="SERVER_2.INITO" dx1="0.0" dx2="0.0" dy="0.0"/>
+      <Connection Destination="SET_POWER.REQ" Source="RSP" dx1="0.0" dx2="0.0" dy="0.0"/>
+      <Connection Destination="CONTROL_MODE.REQ" Source="SET_POWER.CNF" dx1="0.0" dx2="0.0" dy="95.0"/>
+      <Connection Destination="SERVER_2.RSP" Source="CONTROL_MODE.CNF" dx1="0.0" dx2="0.0" dy="0.0"/>
     </EventConnections>
   </FBNetwork>
 </FBType>
