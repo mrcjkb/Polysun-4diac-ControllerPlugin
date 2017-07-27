@@ -7,8 +7,6 @@ import java.util.Map;
 import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration;
 import com.velasolaris.plugin.controller.spi.PluginControllerException;
 
-import de.htw.berlin.polysun4diac.exception.UnsupportedForteDataTypeException;
-
 /**
  * Defines the default behaviour of a FORTE sensor plugin controller for sending data to IEC 61499 applications running on 4diac-RTE (FORTE).
  * @author Marc Jakobi</p>HTW Berlin</p>July 2017
@@ -45,15 +43,7 @@ public abstract class AbstractSensorController extends AbstractSingleComponentCo
 			}
 			// Wait for response from FORTE if specified so by user.
 			if (getProp(WAITFORRSP_KEY).getInt() != DONTWAITFORRSP) {
-				try { // Wait for response from FORTE before returning
-					getSocket().recvData();
-				} catch (UnsupportedForteDataTypeException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
-				} 
+				recvData();
 			}
 			return null;
 		} catch (PluginControllerException e) {

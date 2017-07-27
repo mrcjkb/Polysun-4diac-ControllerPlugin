@@ -6,6 +6,7 @@ import java.util.List;
 import com.velasolaris.plugin.controller.spi.PluginControllerException;
 import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Property;
 
+import de.htw.berlin.polysun4diac.exception.UnsupportedForteDataTypeException;
 import de.htw.berlin.polysun4diac.forte.comm.CommLayerParams;
 import de.htw.berlin.polysun4diac.forte.comm.IForteSocket;
 
@@ -81,5 +82,21 @@ public abstract class AbstractSingleComponentController extends Abstract4diacPlu
 	/** Sets the socket for communicating with FORTE */
 	protected void setSocket(IForteSocket socket) {
 		mSocket = socket;
+	}
+	
+	/**
+	 * Attempts to call the socked's recvData() method.
+	 * @throws PluginControllerException
+	 */
+	protected void recvData() throws PluginControllerException {
+		try { // Wait for input from FORTE
+			getSocket().recvData();
+		} catch (UnsupportedForteDataTypeException e) {
+			e.printStackTrace();
+			throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
+		}
 	}
 }

@@ -127,15 +127,7 @@ public class GenericForteController extends AbstractSingleComponentController {
 				throw new PluginControllerException(getName() + ": Error sending Polysun data to FORTE.", e);
 			}
 			if (controlSignals.length > 0) {
-				try { // Wait for input from FORTE
-					getSocket().recvData();
-				} catch (UnsupportedForteDataTypeException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
-				}
+				recvData();
 				for (int i = 0; i < controlSignals.length; i++) {
 					if (!getSocket().isFloat()) {
 						throw new PluginControllerException(getName() + ": The FORTE CSIFB should only send REAL data.");
