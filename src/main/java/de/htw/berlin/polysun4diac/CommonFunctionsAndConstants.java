@@ -20,7 +20,7 @@ public class CommonFunctionsAndConstants {
 	/** Path to the default plugin controller image. */
 	public static final String DEF_IMGPATH = "plugin/images/controller_plugin.png";
 	/** Path to the plugin controller image. */
-	public static final String IMGPATH = "controller_4diac.png";
+	public static final String IMGPATH = "plugin/images/controller_4diac.png";
 	/** Default client address for communication with 4diac function blocks. */
 	public static final String DEF_TCP_ADDRESS = "localhost";
 	/** Smallest port number allowed (0 would cause the system to assign a free port randomly, which is not desirable here. */
