@@ -85,7 +85,7 @@ public abstract class AbstractSingleComponentController extends Abstract4diacPlu
 	}
 	
 	/**
-	 * Attempts to call the socked's recvData() method.
+	 * Attempts to call the socket's recvData() method.
 	 * @throws PluginControllerException
 	 */
 	protected void recvData() throws PluginControllerException {
@@ -97,6 +97,18 @@ public abstract class AbstractSingleComponentController extends Abstract4diacPlu
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
+		}
+	}
+	
+	/**
+	 * Attempts to call the socket's sendData() method.
+	 * @throws PluginControllerException
+	 */
+	protected void sendData() throws PluginControllerException {
+		try {
+			getSocket().sendData();
+		} catch (IOException e) {
+			throw new PluginControllerException(getName() + ": Error sending data to Forte.");
 		}
 	}
 }

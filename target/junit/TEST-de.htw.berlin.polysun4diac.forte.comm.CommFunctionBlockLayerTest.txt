@@ -1,5 +1,0 @@
-Testsuite: de.htw.berlin.polysun4diac.forte.comm.CommFunctionBlockLayerTest
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.103 sec
-
-Testcase: testNoOutput took 0.022 sec
-Testcase: testDifferingInputOutput took 0.002 sec

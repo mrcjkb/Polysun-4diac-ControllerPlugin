@@ -28,13 +28,18 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	private static final float MIN_FORECAST_HORIZON = 0.001f;
 	/** Maximum forecast horizon in h */
 	private static final float MAX_FORECAST_HORIZON = 24.0f;
+	/** Number of arguments to the preSimulate() method */
+	private static final int NUM_PRESIMULATION_ARGS = 3;
 	
 	/** Arguments for pre-simulation */
-	private List<Object> mPreSimulationArgs = new ArrayList<Object>(3);
+	private List<Object> mPreSimulationArgs = new ArrayList<Object>(NUM_PRESIMULATION_ARGS);
 	
 	public BatteryPreSimulatorSocket() throws PluginControllerException {
 		super();
 		setSendTimestamp(false); // Disable time stamp option
+		for (int i = 0; i < NUM_PRESIMULATION_ARGS; i++) {
+			mPreSimulationArgs.add(new Object[0]);
+		}
 	}
 
 	@Override
@@ -44,7 +49,7 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	
 	@Override
 	public String getVersion() {
-		return "1.0-prerelease";
+		return "1.0 - prerelease";
 	}
 	
 	@Override
@@ -75,6 +80,7 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 					List<Object> output = getPreSimulatableComponent(PRESIMULATABLE_BATTERY_KEY).preSimulate(getPreSimulationArgs());
 					// Send the result to FORTE.
 					getSocket().put((double) output.get(0));
+					sendData();
 				} else {
 					throw new PluginControllerException(getName() + ": Unexpected data type received from FORTE.");
 				}

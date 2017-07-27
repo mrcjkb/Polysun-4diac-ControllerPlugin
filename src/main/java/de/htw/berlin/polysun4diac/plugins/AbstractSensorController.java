@@ -1,7 +1,6 @@
 package de.htw.berlin.polysun4diac.plugins;
 
 
-import java.io.IOException;
 import java.util.Map;
 
 import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration;
@@ -32,15 +31,12 @@ public abstract class AbstractSensorController extends AbstractSingleComponentCo
 			}
 			// Buffer inputs
 			putSensors(sensors);
-			try { // Send buffer to FORTE
-				if (sendTimestamp()) {
-					getForteTimestamp().setSimulationTimeS(simulationTime);
-					getSocket().put(getForteTimestamp());
-				}
-				getSocket().sendData();
-			} catch (IOException e) {
-				throw new PluginControllerException(getName() + ": Error sending Polysun data to FORTE.", e);
+			// Send buffer to FORTE
+			if (sendTimestamp()) {
+				getForteTimestamp().setSimulationTimeS(simulationTime);
+				getSocket().put(getForteTimestamp());
 			}
+			sendData();
 			// Wait for response from FORTE if specified so by user.
 			if (getProp(WAITFORRSP_KEY).getInt() != DONTWAITFORRSP) {
 				recvData();

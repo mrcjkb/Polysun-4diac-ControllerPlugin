@@ -51,11 +51,6 @@ public class GenericForteController extends AbstractSingleComponentController {
 	}
 	
 	@Override
-	public String getVersion() {
-		return "1.0 (BETA)";
-	}
-	
-	@Override
 	public PluginControllerConfiguration getConfiguration(Map<String, Object> parameters)
 			throws PluginControllerException {
 		return new PluginControllerConfiguration(initialisePropertyList(), null, null, null, 0, MAX_NUM_GENERIC_SENSORS, MAX_NUM_GENERIC_SIGNALS, getPluginIconResource(), null);
@@ -117,15 +112,11 @@ public class GenericForteController extends AbstractSingleComponentController {
 			for (float s : sensors) {
 				getSocket().put(s);
 			}
-			try { // Send buffer to FORTE
-				if (sendTimestamp()) {
-					getForteTimestamp().setSimulationTimeS(simulationTime);
-					getSocket().put(getForteTimestamp());
-				}
-				getSocket().sendData();
-			} catch (IOException e) {
-				throw new PluginControllerException(getName() + ": Error sending Polysun data to FORTE.", e);
+			if (sendTimestamp()) {
+				getForteTimestamp().setSimulationTimeS(simulationTime);
+				getSocket().put(getForteTimestamp());
 			}
+			sendData();
 			if (controlSignals.length > 0) {
 				recvData();
 				for (int i = 0; i < controlSignals.length; i++) {
