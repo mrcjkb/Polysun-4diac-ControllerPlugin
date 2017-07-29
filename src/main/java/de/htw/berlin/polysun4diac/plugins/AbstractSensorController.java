@@ -31,7 +31,6 @@ public abstract class AbstractSensorController extends AbstractSingleComponentCo
 			}
 			// Buffer inputs
 			putSensors(sensors);
-			// Send buffer to FORTE
 			if (sendTimestamp()) {
 				getForteTimestamp().setSimulationTimeS(simulationTime);
 				getSocket().put(getForteTimestamp());

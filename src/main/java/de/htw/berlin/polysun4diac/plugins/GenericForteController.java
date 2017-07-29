@@ -2,7 +2,6 @@ package de.htw.berlin.polysun4diac.plugins;
 
 import static de.htw.berlin.polysun4diac.CommonFunctionsAndConstants.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +11,6 @@ import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Prope
 import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Sensor;
 import com.velasolaris.plugin.controller.spi.PolysunSettings.PropertyValue;
 
-import de.htw.berlin.polysun4diac.exception.UnsupportedForteDataTypeException;
 import de.htw.berlin.polysun4diac.forte.comm.CommLayerParams;
 import de.htw.berlin.polysun4diac.forte.comm.ForteServiceType;
 import de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType;
@@ -126,15 +124,7 @@ public class GenericForteController extends AbstractSingleComponentController {
 					controlSignals[i] = getSocket().getFloat();
 				}
 			} else if (getProp(WAITFORRSP_KEY).getInt() != DONTWAITFORRSP) {
-				try { // Wait for response from FORTE before returning
-					getSocket().recvData();
-				} catch (UnsupportedForteDataTypeException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
-				} 
+				recvData();
 			}
 			return null;
 		} catch (PluginControllerException e) {
