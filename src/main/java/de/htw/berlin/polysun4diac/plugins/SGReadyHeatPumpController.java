@@ -133,11 +133,18 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 	public String getName() {
 		return "SG Ready Heat Pump Adapter";
 	}
+	
+	@Override
+	public String getVersion() {
+		return "1.0 prerelease";
+	}
 
 	@Override
 	public String getDescription() {
 		return "Actor for receiving the heat pump's SG Ready control mode from 4diac-RTE (FORTE). "
-				+ "This controller acts as an adapter between the SG ready control modes and Polysun's heat pump control modes. A modulating heat pump is required.";
+				+ "This controller acts as an adapter between the SG ready control modes and Polysun's heat pump control modes. It overrides the setting of a heating controller "
+				+ "and must be place in the GUI AFTER the heating controller is placed. "
+				+ "This plugin controller is a prerelease! It does not currently work as intended with Polysun 10. It will work with Polysun 11.";
 	}
 
 	@Override
@@ -203,6 +210,8 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 	@Override
 	public int[] control(int simulationTime, boolean status, float[] sensors, float[] controlSignals, float[] logValues,
 			boolean preRun, Map<String, Object> parameters) throws PluginControllerException {
+		// Initialise NORMAL operation
+		mSGReadyMode2[0] = controlSignals[0]; // The initial value of controlSignals[] is set by the previous controller.
 		if (!status) {
 			return null;
 		}
@@ -228,8 +237,6 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 			case OFF_OPERATION:
 				sgReadyIntSignal = controlOffOperation(simulationTime);
 				break;
-			case NORMAL_OPERATION:
-				mSGReadyMode2[0] = sensors[0]; // The initial value of sensors[] is set by the previous controller.
 			case AMPLIFIED_OPERATION:
 				sgReadyIntSignal = controlAutoControlledOperation(getSensor(SENSOR1, sensors), AutoControlledControlMode.AMPLIFIED);
 				break;

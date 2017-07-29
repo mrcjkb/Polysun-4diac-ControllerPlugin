@@ -39,8 +39,7 @@ public class SGReadyHeatPumpTest {
 
 	private static final String SENSOR1 = "Temperature of buffer storage.";
 	private static final String CSIGNAL1 = "Heat pump ON/OFF";
-	private static final String CSIGNAL2 = "Control mode";
-	private static final String CSIGNAL3 = "Internal electric heating element ON/OFF";
+	private static final String CSIGNAL2 = "Internal electric heating element ON/OFF";
 	private static final String NAME = "SG Ready Heat Pump Adapter";
 	/** Precision for assertions of double/float data */
 	private static double PRECISION = 0.000001;
@@ -83,7 +82,7 @@ public class SGReadyHeatPumpTest {
 	 * 	- control mode: doesn't matter </p>
 	 *  - auxiliary heater: off
 	 */
-	private float[] MODE1 = {0.0f, 1.0f, 0.0f};
+	private float[] MODE1 = {0.0f, 0.0f};
 	/** 
 	 * Polysun control mode equivalent to the SG Ready control mode 2: NORMAL OPERATION </p>
 	 * Default Polysun setting for this mode: </p>
@@ -91,7 +90,7 @@ public class SGReadyHeatPumpTest {
 	 * 	- control mode: 1 (normal operation) </p>
 	 *  - auxiliary heater: on
 	 */
-	private float[] MODE2 = {1.0f, 1.0f, 0.0f};
+	private float[] MODE2 = {0.0f, 0.0f};
 	/** 
 	 * Polysun control mode equivalent to the SG Ready control mode 3: AMPLIFIED (with an auxiliary heater).
 	 * This mode is enabled until the temperature in the buffer tank exceeds a certain temperature, then it switches to {@link #mSGReadyMode1}.</p>
@@ -100,7 +99,7 @@ public class SGReadyHeatPumpTest {
 	 * 	- control mode: 0 (maximum power)</p>
 	 *  - auxiliary heater: on
 	 */
-	private float[] MODE3_AUX = {1.0f, 0.0f, 1.0f};
+	private float[] MODE3_AUX = {1.0f, 1.0f};
 	/** 
 	 * Polysun control mode equivalent to the SG Ready control mode 3: AMPLIFIED (with an auxiliary heater).
 	 * This mode is enabled until the temperature in the buffer tank exceeds a certain temperature, then it switches to {@link #mSGReadyMode1}.</p>
@@ -109,7 +108,7 @@ public class SGReadyHeatPumpTest {
 	 * 	- control mode: 0 (maximum power)</p>
 	 *  - auxiliary heater: off
 	 */
-	private float[] MODE3_NOAUX = {1.0f, 0.0f, 0.0f};
+	private float[] MODE3_NOAUX = {1.0f, 0.0f};
 	/** 
 	 * Polysun control mode equivalent to the SG Ready control mode 4: ONMAX (without an auxiliary heater). This mode runs all the time. </p>
 	 * Default Polysun setting for this mode:</p>
@@ -117,7 +116,7 @@ public class SGReadyHeatPumpTest {
 	 * 	- control mode: 0 (maximum power)</p>
 	 *  - auxiliary heater: on
 	 */
-	private float[] MODE4_AUX = {1.0f, 0.0f, 1.0f};
+	private float[] MODE4_AUX = {1.0f, 1.0f};
 	/** 
 	 * Polysun control mode equivalent to the SG Ready control mode 4: ONMAX (without an auxiliary heater). This mode runs all the time. </p>
 	 * Default Polysun setting for this mode:</p>
@@ -125,7 +124,7 @@ public class SGReadyHeatPumpTest {
 	 * 	- control mode: 0 (maximum power)</p>
 	 *  - auxiliary heater: off
 	 */
-	private float[] MODE4_NOAUX = {1.0f, 0.0f, 0.0f};
+	private float[] MODE4_NOAUX = {1.0f, 0.0f};
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -159,8 +158,7 @@ public class SGReadyHeatPumpTest {
 
 		List<ControlSignal> controlSignals = new ArrayList<>();
 		controlSignals.add(new ControlSignal(CSIGNAL1, "", false, true, true));
-		controlSignals.add(new ControlSignal(CSIGNAL2, "", false, true, true));
-		controlSignals.add(new ControlSignal(CSIGNAL3, "", false, false, true));
+		controlSignals.add(new ControlSignal(CSIGNAL2, "", false, false, true));
 
 		List<Log> logs = new ArrayList<>();
 
@@ -205,7 +203,7 @@ public class SGReadyHeatPumpTest {
 		for (ControlSignal controlSignal : configuration.getControlSignals()) {
 			controlSignals.add(new ControlSignal(controlSignal.getName(), controlSignal.getUnit(),
 					controlSignal.isAnalog(), controlSignal.isRequired(),
-					CSIGNAL1.equals(controlSignal.getName()) || CSIGNAL2.equals(controlSignal.getName()) || CSIGNAL3.equals(controlSignal.getName())));
+					CSIGNAL1.equals(controlSignal.getName()) || CSIGNAL2.equals(controlSignal.getName())));
 		}
 
 		List<Log> logs = new ArrayList<>();
@@ -309,7 +307,7 @@ public class SGReadyHeatPumpTest {
 		assertEquals("Wrong number of generic properties", 0, configuration.getNumGenericProperties());
 		assertEquals("Wrong number of configured sensors", 1, configuration.getSensors().size());
 		assertEquals("Wrong number of generic sensors", 0, configuration.getNumGenericSensors());
-		assertEquals("Wrong number of configured controlSignals", 3, configuration.getControlSignals().size());
+		assertEquals("Wrong number of configured controlSignals", 2, configuration.getControlSignals().size());
 		assertEquals("Wrong number of generic controlSignals", 0, configuration.getNumGenericControlSignals());
 		assertEquals("Wrong number of logs", 0, configuration.getLogs().size());
 		assertEquals("Wrong controller image", getPluginIconResource(), configuration.getImagePath());
@@ -439,7 +437,7 @@ public class SGReadyHeatPumpTest {
 	@Test
 	public void testNormalControlMode() throws Exception {
 		float[] sensors = new float[] {0};
-		float[] controlSignals = new float[3];
+		float[] controlSignals = new float[2];
 		float[] logValues = new float[3];
 		int simulationTime = 0;
 		// Test NORMAL control mode
@@ -461,7 +459,7 @@ public class SGReadyHeatPumpTest {
 	public void testOffControlMode() throws Exception {
 		setWait(false);
 		float[] sensors = new float[] {0};
-		float[] controlSignals = new float[3];
+		float[] controlSignals = new float[2];
 		float[] logValues = new float[3];
 		int simulationTime = 0;
 		// Test OFF control mode.
@@ -478,6 +476,7 @@ public class SGReadyHeatPumpTest {
 		// Test 2 hour time limitation of OFF operation
 		simulationTime += OFF_TIME_LIM_S + 1;
 		setWait(false); // Unlock echo Thread
+		controlSignals[0] = MODE2[0];
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
 		for (int i = 0; i < controlSignals.length; i++) {
 			assertEquals("Forcing NORMAL operation after 2 hours of OFF operation failed.", MODE2[i], controlSignals[i], PRECISION);
@@ -517,7 +516,7 @@ public class SGReadyHeatPumpTest {
 	public void testDefaultAmplifiedControlMode() throws Exception {
 		setWait(false);
 		float[] sensors = new float[] {0};
-		float[] controlSignals = new float[3];
+		float[] controlSignals = new float[2];
 		float[] logValues = new float[3];
 		int simulationTime = 0;
 		// Test AMPLIFIED control mode.
@@ -533,6 +532,7 @@ public class SGReadyHeatPumpTest {
 		}
 		// Test behaviour when temperature exceeds threshold
 		sensors[0] = DEF_TEMP_THRESHOLDS[0] + 1;
+		controlSignals[0] = MODE2[0];
 		setWait(false);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
 		for (int i = 0; i < controlSignals.length; i++) {
@@ -580,7 +580,7 @@ public class SGReadyHeatPumpTest {
 	public void testDefaultOnMaxControlMode() throws Exception {
 		setWait(false);
 		float[] sensors = new float[] {0};
-		float[] controlSignals = new float[3];
+		float[] controlSignals = new float[2];
 		float[] logValues = new float[3];
 		int simulationTime = 0;
 		// Test ONMAX control mode.
@@ -596,6 +596,7 @@ public class SGReadyHeatPumpTest {
 		}
 		// Test behaviour when temperature exceeds threshold
 		sensors[0] = DEF_TEMP_THRESHOLDS[1] + 1;
+		controlSignals[0] = MODE2[0];
 		setWait(false);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
 		for (int i = 0; i < controlSignals.length; i++) {
@@ -643,7 +644,7 @@ public class SGReadyHeatPumpTest {
 	public void testAmplifiedWithAuxiliaryHeaterControlMode() throws Exception {
 		setWait(false);
 		float[] sensors = new float[] {0};
-		float[] controlSignals = new float[3];
+		float[] controlSignals = new float[2];
 		float[] logValues = new float[3];
 		int simulationTime = 0;
 		// Test AMPLIFIED control mode.
@@ -664,7 +665,7 @@ public class SGReadyHeatPumpTest {
 	public void testOnMaxWithoutAuxiliaryHeaterControlMode() throws Exception {
 		setWait(false);
 		float[] sensors = new float[] {0};
-		float[] controlSignals = new float[3];
+		float[] controlSignals = new float[2];
 		float[] logValues = new float[3];
 		int simulationTime = 0;
 		// Test ONMAX control mode.
