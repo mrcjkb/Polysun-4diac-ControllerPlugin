@@ -1,13 +1,11 @@
 package de.htw.berlin.polysun4diac.plugins;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import com.velasolaris.plugin.controller.spi.PluginControllerException;
 import com.velasolaris.plugin.controller.spi.PolysunSettings;
 
-import de.htw.berlin.polysun4diac.exception.UnsupportedForteDataTypeException;
 
 /**
  * Defines the default behaviour of a FORTE actor plugin controller for receiving control signals from IEC 61499 applications running on 4diac-RTE (FORTE).
@@ -29,15 +27,7 @@ public abstract class AbstractActorController extends AbstractSingleComponentCon
 		if (!status) {
 			return null;
 		}
-		try { // Wait for input from FORTE
-			getSocket().recvData();
-		} catch (UnsupportedForteDataTypeException e) {
-			e.printStackTrace();
-			throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
-		}
+		recvData();
 		populateControlSignals(controlSignals);
 		return null;
 	}

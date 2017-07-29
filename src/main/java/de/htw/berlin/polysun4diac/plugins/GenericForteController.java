@@ -52,7 +52,7 @@ public class GenericForteController extends AbstractSingleComponentController {
 	
 	@Override
 	public String getVersion() {
-		return "1.0 (BETA)";
+		return "1.0";
 	}
 	
 	@Override
@@ -117,15 +117,11 @@ public class GenericForteController extends AbstractSingleComponentController {
 			for (float s : sensors) {
 				getSocket().put(s);
 			}
-			try { // Send buffer to FORTE
-				if (sendTimestamp()) {
-					getForteTimestamp().setSimulationTimeS(simulationTime);
-					getSocket().put(getForteTimestamp());
-				}
-				getSocket().sendData();
-			} catch (IOException e) {
-				throw new PluginControllerException(getName() + ": Error sending Polysun data to FORTE.", e);
+			if (sendTimestamp()) {
+				getForteTimestamp().setSimulationTimeS(simulationTime);
+				getSocket().put(getForteTimestamp());
 			}
+			sendData();
 			if (controlSignals.length > 0) {
 				try { // Wait for input from FORTE
 					getSocket().recvData();
@@ -143,15 +139,7 @@ public class GenericForteController extends AbstractSingleComponentController {
 					controlSignals[i] = getSocket().getFloat();
 				}
 			} else if (getProp(WAITFORRSP_KEY).getInt() != DONTWAITFORRSP) {
-				try { // Wait for response from FORTE before returning
-					getSocket().recvData();
-				} catch (UnsupportedForteDataTypeException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
-				} 
+				recvData();
 			}
 			return null;
 		} catch (PluginControllerException e) {
