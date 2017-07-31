@@ -164,6 +164,6 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	 * @return <code>true</code> if timeIntex is a time at which FORTE calls the socket.
 	 */
 	public boolean isCallTime(int timeIndex) {
-		return (double) (timeIndex + 1) / getProp(CALL_INTERVAL_KEY).getInt() - 1 == ceil((double) (timeIndex + 1) / getProp(CALL_INTERVAL_KEY).getInt()) - 1;
+		return (double) timeIndex / getProp(CALL_INTERVAL_KEY).getInt() - 1 == ceil((double) timeIndex / getProp(CALL_INTERVAL_KEY).getInt()) - 1;
 	}
 }
