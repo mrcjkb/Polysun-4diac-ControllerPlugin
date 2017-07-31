@@ -35,6 +35,8 @@ public class CommonFunctionsAndConstants {
 	public static final int MAX_NUM_GENERIC_SENSORS = 5;
 	/** Maximum number of generic control signals */
 	public static final int MAX_NUM_GENERIC_SIGNALS = 5;
+	/** One hour in seconds */
+	public static final int SECONDS_PER_HOUR = 3600;
 	/** Number of seconds per year */
 	public static final int NUM_SECONDS_PER_YEAR = 31536000;
 
