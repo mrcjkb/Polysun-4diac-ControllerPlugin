@@ -69,7 +69,6 @@ public abstract class AbstractSingleComponentController extends Abstract4diacPlu
 		try {
 			setSocket(params.makeIPSocket());
 		} catch (IOException e) {
-			e.printStackTrace();
 			throw new PluginControllerException(getName() + ": Unable to connect to FORTE.", e);
 		}
 	}
@@ -92,10 +91,8 @@ public abstract class AbstractSingleComponentController extends Abstract4diacPlu
 		try { // Wait for input from FORTE
 			getSocket().recvData();
 		} catch (UnsupportedForteDataTypeException e) {
-			e.printStackTrace();
 			throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
 		} catch (IOException e) {
-			e.printStackTrace();
 			throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
 		}
 	}

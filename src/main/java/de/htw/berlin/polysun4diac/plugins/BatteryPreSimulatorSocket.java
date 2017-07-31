@@ -2,6 +2,7 @@ package de.htw.berlin.polysun4diac.plugins;
 
 /*
  * MTODO Write JUnit tests
+ * MTODO Add Optimization interval as param --> + isOptimizationTime() method for control()
  */
 import static de.htw.berlin.polysun4diac.CommonFunctionsAndConstants.*;
 
