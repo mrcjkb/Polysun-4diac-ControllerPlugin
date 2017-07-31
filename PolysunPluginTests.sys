@@ -47,6 +47,11 @@
         <Parameter Name="ID" Value="localhost:61504"/>
       </FB>
       <FB Name="E_PERMIT_0_0" Type="E_PERMIT" x="5320.0" y="1520.0"/>
+      <FB Name="BOOL2BOOL" Type="BOOL2BOOL" x="4085.0" y="2185.0"/>
+      <FB Name="SERVER_1_0" Type="SERVER_1" x="5300.0" y="2015.0">
+        <Parameter Name="QI" Value="TRUE"/>
+        <Parameter Name="ID" Value="localhost:61506"/>
+      </FB>
       <EventConnections>
         <Connection Destination="REAL2REAL_0.REQ" Source="SERVER_2_0.IND" dx1="0.0" dx2="0.0" dy="-480.0"/>
         <Connection Destination="INT2INT_0.REQ" Source="REAL2REAL_0.CNF" dx1="0.0" dx2="0.0" dy="0.0"/>
@@ -74,6 +79,9 @@
         <Connection Destination="SINT2SINT_0.REQ" Source="REAL2REAL_1.CNF" dx1="0.0" dx2="0.0" dy="95.0"/>
         <Connection Destination="SERVER_0_1_0_0.INIT" Source="SERVER_1_0_0.INITO" dx1="0.0" dx2="0.0" dy="0.0"/>
         <Connection Destination="SERVER_1_0_0.INIT" Source="SERVER_3.INITO" dx1="0.0" dx2="0.0" dy="0.0"/>
+        <Connection Destination="SERVER_1_0.RSP" Source="BOOL2BOOL.CNF" dx1="0.0" dx2="0.0" dy="0.0"/>
+        <Connection Destination="BOOL2BOOL.REQ" Source="SERVER_1_0.IND" dx1="385.0" dx2="-250.0" dy="615.0"/>
+        <Connection Destination="SERVER_1_0.INIT" Source="SERVER_0_1_0_0.INITO" dx1="0.0" dx2="0.0" dy="0.0"/>
         <Connection Destination="SERVER_1.INIT" Source="START.COLD" dx1="0.0" dx2="0.0" dy="0.0"/>
         <Connection Destination="SERVER_1.INIT" Source="START.WARM" dx1="0.0" dx2="0.0" dy="0.0"/>
       </EventConnections>
@@ -102,6 +110,8 @@
         <Connection Destination="SINT2SINT_0.IN" Source="SERVER_1_0_0.RD_2" dx1="0.0" dx2="0.0" dy="0.0"/>
         <Connection Destination="VALUES2ARRAY_2_LREAL_0.IN_1" Source="LREAL2LREAL_1_0.OUT" dx1="0.0" dx2="0.0" dy="0.0"/>
         <Connection Destination="LREAL2LREAL_2_0_0.IN" Source="SERVER_0_1_0_0.RD_1" dx1="0.0" dx2="0.0" dy="0.0"/>
+        <Connection Destination="SERVER_1_0.SD_1" Source="BOOL2BOOL.OUT" dx1="0.0" dx2="0.0" dy="0.0"/>
+        <Connection Destination="BOOL2BOOL.IN" Source="SERVER_1_0.RD_1" dx1="0.0" dx2="0.0" dy="125.0"/>
       </DataConnections>
     </SubAppNetwork>
   </Application>
@@ -154,6 +164,11 @@
           <Parameter Name="ID" Value="localhost:61504"/>
         </FB>
         <FB Name="E_PERMIT_0_0" Type="E_PERMIT" x="5320.0" y="1520.0"/>
+        <FB Name="BOOL2BOOL" Type="BOOL2BOOL" x="4085.0" y="2185.0"/>
+        <FB Name="SERVER_1_0" Type="SERVER_1" x="5300.0" y="2015.0">
+          <Parameter Name="QI" Value="TRUE"/>
+          <Parameter Name="ID" Value="localhost:61506"/>
+        </FB>
         <EventConnections>
           <Connection Destination="SERVER_3.INIT" Source="SERVER_2_0.INITO" dx1="0.0" dx2="0.0" dy="0.0"/>
           <Connection Destination="SERVER_2_0.INIT" Source="SERVER_1.INITO" dx1="0.0" dx2="0.0" dy="0.0"/>
@@ -161,6 +176,7 @@
           <Connection Destination="SERVER_1.INIT" Source="START.WARM" dx1="0.0" dx2="0.0" dy="0.0"/>
           <Connection Destination="SERVER_1_0_0.INIT" Source="SERVER_3.INITO" dx1="0.0" dx2="0.0" dy="0.0"/>
           <Connection Destination="SERVER_0_1_0_0.INIT" Source="SERVER_1_0_0.INITO" dx1="0.0" dx2="0.0" dy="0.0"/>
+          <Connection Destination="SERVER_1_0.INIT" Source="SERVER_0_1_0_0.INITO" dx1="0.0" dx2="0.0" dy="0.0"/>
         </EventConnections>
       </FBNetwork>
     </Resource>

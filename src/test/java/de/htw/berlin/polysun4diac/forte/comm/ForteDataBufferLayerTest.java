@@ -7,10 +7,8 @@ import java.net.InetAddress;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import de.htw.berlin.polysun4diac.forte.comm.ForteDataBufferLayer;
 import de.htw.berlin.polysun4diac.forte.datatypes.DateAndTime;
 import de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType;
 
@@ -47,6 +45,7 @@ public class ForteDataBufferLayerTest {
 	IForteSocket singleInputSocket;
 	IForteSocket inputOutputSocket;
 	IForteSocket arraySocket;
+	IForteSocket boolSocket;
 	CommLayerParams params1;
 	CommLayerParams params2;
 	CommLayerParams params3;
@@ -55,7 +54,7 @@ public class ForteDataBufferLayerTest {
 	/** DateAmdTime value to test sending and receiving */
 	DateAndTime dtValue = new DateAndTime(2017);
 	
-	@Ignore @Before
+	@Before
 	public void setUp() throws Exception {
 		// Set up params (default service type is CLIENT)
 		params1 = new CommLayerParams(InetAddress.getByName(IP), 61500);
@@ -71,16 +70,19 @@ public class ForteDataBufferLayerTest {
 		singleInputSocket = params1.makeIPSocket();
 		inputOutputSocket = params2.makeIPSocket();
 		inputOutputSocket.setDateAndTimeReference(dtValue);
-		arraySocket = new ForteDataBufferLayer();
 		arraySocket = params3.makeIPSocket();
 		dtValue.setSimulationTimeS(0); // Initialize DateAndTime
+		params4 = new CommLayerParams(InetAddress.getByName(IP), 61506);
+		params4.addInputOutput(ForteDataType.BOOL);
+		boolSocket = params4.makeIPSocket();
 	}
 	
-	@Ignore @After
+	@After
 	public void tearDown() throws Exception {
 		singleInputSocket.disconnect();
 		inputOutputSocket.disconnect();
 		arraySocket.disconnect();
+		boolSocket.disconnect();
 	}
 	
 	@Test 
@@ -101,6 +103,22 @@ public class ForteDataBufferLayerTest {
 			singleInputSocket.recvData();
 			assertTrue(singleInputSocket.isDouble());
 			assertEquals("Response from FORTE", DVALUE, singleInputSocket.getDouble(), TEST_TOLERANCE);
+		}
+	}
+	
+	@Test
+	public void testSendReceiveBool() throws Exception {
+		for (int i = 0; i < NUM_CYCLES; i++) {
+			boolSocket.put(true);
+			boolSocket.sendData();
+			boolSocket.recvData();
+			assertTrue(boolSocket.isBool());
+			assertTrue(boolSocket.getBool());
+			boolSocket.put(false);
+			boolSocket.sendData();
+			boolSocket.recvData();
+			assertTrue(boolSocket.isBool());
+			assertFalse(boolSocket.getBool());
 		}
 	}
 	

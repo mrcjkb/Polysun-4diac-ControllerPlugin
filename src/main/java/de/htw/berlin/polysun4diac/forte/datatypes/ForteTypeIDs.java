@@ -7,10 +7,10 @@ package de.htw.berlin.polysun4diac.forte.datatypes;
  */
 public final class ForteTypeIDs {
 	
-	/** FORTE type ID of true BOOL data type */
-	public static final byte TBOOLID = 64;
 	/** FORTE type ID of false BOOL data type */
-	public static final byte FBOOLID = 65;
+	public static final byte FBOOLID = 64;
+	/** FORTE type ID of true BOOL data type */
+	public static final byte TBOOLID = 65;
 	/** FORTE type ID of SINT data type */
 	public static final byte SINTID = 66;
 	/** FORTE type ID of INT data type */
