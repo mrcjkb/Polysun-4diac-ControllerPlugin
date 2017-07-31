@@ -5,6 +5,7 @@ package de.htw.berlin.polysun4diac.plugins;
  * MTODO Add Optimization interval as param --> + isOptimizationTime() method for control()
  */
 import static de.htw.berlin.polysun4diac.CommonFunctionsAndConstants.*;
+import static java.lang.Math.ceil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,8 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	private static final String PRESIMULATABLE_BATTERY_KEY = "BATTERY";
 	/** Key for the forecast horizon property */
 	private static final String FORECAST_HORIZON_KEY = "Forecast horizon";
+	/** Key for the call interval property */
+	private static final String CALL_INTERVAL_KEY = "Call interval";
 	/** Default forecast horizon in h */
 	private static final float DEF_FORECAST_HORIZON = 15.0f;
 	/** Minimum forecast horizon in h */
@@ -40,6 +43,12 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	private static final float MAX_FORECAST_HORIZON = 24.0f;
 	/** Number of arguments to the preSimulate() method */
 	private static final int NUM_PRESIMULATION_ARGS = 3;
+	/** Default call interval [s] */
+	private static final int DEF_CALL_INTERVAL = 900;
+	/** Minimum call interval [s] */
+	private static final int MIN_CALL_INTERVAL = 1;
+	/** Maximum call interval [s] */
+	private static final int MAX_CALL_INTERVAL = 86400;
 
 	/** Arguments for pre-simulation */
 	private List<Object> mPreSimulationArgs = new ArrayList<Object>(NUM_PRESIMULATION_ARGS);
@@ -76,38 +85,40 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	@Override
 	public int[] control(int simulationTime, boolean status, float[] sensors, float[] controlSignals, float[] logValues,
 			boolean preRun, Map<String, Object> parameters) throws PluginControllerException {
-		try {
-			if (isPreSimulatableComponentAvailable(PRESIMULATABLE_BATTERY_KEY)) {
-				// Run in a loop until FORTE signals to stop.
-				boolean run = true;
-				while (run) {
-					recvData();
-					if (!getSocket().isBool()) {
-						throw new PluginControllerException(getName() + ": Expected BOOL data from FORTE.");
+		if (status && isCallTime(simulationTime)) {
+			try {
+				if (isPreSimulatableComponentAvailable(PRESIMULATABLE_BATTERY_KEY)) {
+					// Run in a loop until FORTE signals to stop.
+					boolean run = true;
+					while (run) {
+						recvData();
+						if (!getSocket().isBool()) {
+							throw new PluginControllerException(getName() + ": Expected BOOL data from FORTE.");
+						}
+						run = getSocket().getBool();
+						if (!getSocket().isDouble()) {
+							throw new PluginControllerException(getName() + ": Expected LREAL data from FORTE.");
+						}
+						getPreSimulationArgs().set(0, simulationTime);
+						double chargingEnergykWh = getSocket().getDouble();
+						// Convert energy in kWh to power in kW.
+						getPreSimulationArgs().set(1, chargingEnergykWh / (double) getProp(FORECAST_HORIZON_KEY).getFloat());
+						// Convert forecast horizon from hours to seconds.
+						getPreSimulationArgs().set(2, (int) (getProp(FORECAST_HORIZON_KEY).getFloat() * (float) SECONDS_PER_HOUR));
+						// Tell Polysun to pre-simulate battery.
+						List<Object> output = getPreSimulatableComponent(PRESIMULATABLE_BATTERY_KEY).preSimulate(getPreSimulationArgs());
+						// Send the result to FORTE.
+						getSocket().put(run);
+						getSocket().put((double) output.get(0));
+						sendData();
 					}
-					run = getSocket().getBool();
-					if (!getSocket().isDouble()) {
-						throw new PluginControllerException(getName() + ": Expected LREAL data from FORTE.");
-					}
-					getPreSimulationArgs().set(0, simulationTime);
-					double chargingEnergykWh = getSocket().getDouble();
-					// Convert energy in kWh to power in kW.
-					getPreSimulationArgs().set(1, chargingEnergykWh / (double) getProp(FORECAST_HORIZON_KEY).getFloat());
-					// Convert forecast horizon from hours to seconds.
-					getPreSimulationArgs().set(2, (int) (getProp(FORECAST_HORIZON_KEY).getFloat() * (float) SECONDS_PER_HOUR));
-					// Tell Polysun to pre-simulate battery.
-					List<Object> output = getPreSimulatableComponent(PRESIMULATABLE_BATTERY_KEY).preSimulate(getPreSimulationArgs());
-					// Send the result to FORTE.
-					getSocket().put(run);
-					getSocket().put((double) output.get(0));
-					sendData();
+				} else {
+					throw new PluginControllerException(getName() + ": No battery component found.");
 				}
-			} else {
-				throw new PluginControllerException(getName() + ": No battery component found.");
+			} catch (PluginControllerException e) {
+				disconnect();
+				throw e;
 			}
-		} catch (PluginControllerException e) {
-			disconnect();
-			throw e;
 		}
 		return null;
 	}
@@ -123,6 +134,7 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	protected List<Property> initialisePropertyList() {
 		List<Property> properties = super.initialisePropertyList();
 		properties.add(new Property(FORECAST_HORIZON_KEY, DEF_FORECAST_HORIZON, MIN_FORECAST_HORIZON, MAX_FORECAST_HORIZON, "h", "The forecast horizon over which the battery is pre-simulated."));
+		properties.add(new Property(CALL_INTERVAL_KEY, DEF_CALL_INTERVAL, MIN_CALL_INTERVAL, MAX_CALL_INTERVAL, "s", "The interval at which the pre-simulation is called."));
 		return properties;
 	}
 
@@ -143,5 +155,15 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	 */
 	private List<Object> getPreSimulationArgs() {
 		return mPreSimulationArgs;
+	}
+
+	/**
+	 * Method for checking if the current simulation time step is a time step in which FORTE calls the socket.
+	 * 
+	 * @param timeIndex [s] Current simulation time
+	 * @return <code>true</code> if timeIntex is a time at which FORTE calls the socket.
+	 */
+	public boolean isCallTime(int timeIndex) {
+		return (double) (timeIndex + 1) / getProp(CALL_INTERVAL_KEY).getInt() - 1 == ceil((double) (timeIndex + 1) / getProp(CALL_INTERVAL_KEY).getInt()) - 1;
 	}
 }
