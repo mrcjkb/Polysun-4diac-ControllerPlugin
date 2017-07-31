@@ -1,0 +1,8 @@
+Testsuite: de.htw.berlin.polysun4diac.forte.comm.ForteDataBufferLayerTest
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.11 sec
+
+Testcase: testMultiInputOutput took 0.016 sec
+Testcase: testArray took 0 sec
+Testcase: testSendReceiveBool took 0 sec
+Testcase: testByteBuffer took 0 sec
+Testcase: testSendReceiveDouble took 0 sec

@@ -1,5 +1,6 @@
 package de.htw.berlin.polysun4diac.plugins;
 
+import static de.htw.berlin.polysun4diac.CommonFunctionsAndConstants.*;
 
 import java.util.Map;
 
@@ -32,7 +33,11 @@ public abstract class AbstractSensorController extends AbstractSingleComponentCo
 			// Buffer inputs
 			putSensors(sensors);
 			if (sendTimestamp()) {
-				getForteTimestamp().setSimulationTimeS(simulationTime);
+				if (preRun) {
+					getForteTimestamp().setSimulationTimeS(simulationTime - NUM_SECONDS_PER_YEAR);
+				} else {
+					getForteTimestamp().setSimulationTimeS(simulationTime);
+				}
 				getSocket().put(getForteTimestamp());
 			}
 			sendData();

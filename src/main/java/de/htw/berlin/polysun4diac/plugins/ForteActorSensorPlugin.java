@@ -28,7 +28,6 @@ public class ForteActorSensorPlugin extends AbstractControllerPlugin {
 		controllers.add(GenericActorController.class);
 		controllers.add(GenericSensorController.class);
 		controllers.add(GenericForteController.class);
-		controllers.add(BatteryPreSimulatorSocket.class);
 		return controllers;
 	}
 
