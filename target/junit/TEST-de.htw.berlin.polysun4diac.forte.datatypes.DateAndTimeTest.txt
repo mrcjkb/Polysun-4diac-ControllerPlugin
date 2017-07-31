@@ -1,6 +1,0 @@
-Testsuite: de.htw.berlin.polysun4diac.forte.datatypes.DateAndTimeTest
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.094 sec
-
-Testcase: validateInitializations took 0.003 sec
-Testcase: testSetSimulationTimeS took 0 sec
-Testcase: testStringRepresentation took 0.001 sec

@@ -2,7 +2,6 @@ package de.htw.berlin.polysun4diac.plugins;
 
 import static de.htw.berlin.polysun4diac.CommonFunctionsAndConstants.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +11,6 @@ import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Prope
 import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Sensor;
 import com.velasolaris.plugin.controller.spi.PolysunSettings.PropertyValue;
 
-import de.htw.berlin.polysun4diac.exception.UnsupportedForteDataTypeException;
 import de.htw.berlin.polysun4diac.forte.comm.CommLayerParams;
 import de.htw.berlin.polysun4diac.forte.comm.ForteServiceType;
 import de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType;
@@ -48,11 +46,6 @@ public class GenericForteController extends AbstractSingleComponentController {
 	public String getDescription() {
 		return "Plugin for communicating with a CLIENT, SERVER, PUBLISH or SUBSCRIBE function block running on 4diac-RTE (FORTE). "
 				+ "The digital signals sent are of type REAL.";
-	}
-	
-	@Override
-	public String getVersion() {
-		return "1.0";
 	}
 	
 	@Override
@@ -123,15 +116,7 @@ public class GenericForteController extends AbstractSingleComponentController {
 			}
 			sendData();
 			if (controlSignals.length > 0) {
-				try { // Wait for input from FORTE
-					getSocket().recvData();
-				} catch (UnsupportedForteDataTypeException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Unsupported FORTE data type.", e);
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new PluginControllerException(getName() + ": Error receiving response from FORTE CSIFB.", e);
-				}
+				recvData();
 				for (int i = 0; i < controlSignals.length; i++) {
 					if (!getSocket().isFloat()) {
 						throw new PluginControllerException(getName() + ": The FORTE CSIFB should only send REAL data.");
