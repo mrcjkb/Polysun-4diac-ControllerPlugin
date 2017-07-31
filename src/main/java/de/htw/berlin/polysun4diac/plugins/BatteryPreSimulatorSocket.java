@@ -19,8 +19,11 @@ import com.velasolaris.plugin.controller.spi.PluginControllerException;
 import com.velasolaris.plugin.controller.spi.PolysunSettings;
 
 /**
- * MTODO Javadoc
- *
+ * Plugin controller for pre-simulating the battery. Communicates with a PolysunBatteryModel function block running on 4diac-RTE (FORTE).
+ * @author Marc Jakobi</p>HTW Berlin</p>July 2017
+ * @see de.htw.berlin.polysun4diac.forte.comm.IForteSocket
+ * @see de.htw.berlin.polysun4diac.forte.comm.CommLayerParams
+ * @see com.velasolaris.plugin.controller.spi.IPluginController
  */
 public class BatteryPreSimulatorSocket extends AbstractSingleComponentController {
 
