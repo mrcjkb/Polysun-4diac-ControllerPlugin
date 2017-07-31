@@ -1,5 +1,8 @@
 package de.htw.berlin.polysun4diac.plugins;
 
+/*
+ * MTODO Write JUnit tests
+ */
 import static de.htw.berlin.polysun4diac.CommonFunctionsAndConstants.*;
 
 import java.util.ArrayList;
@@ -10,12 +13,15 @@ import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration;
 import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Property;
 
 import de.htw.berlin.polysun4diac.forte.comm.CommLayerParams;
-import de.htw.berlin.polysun4diac.forte.comm.ForteServiceType;
 import de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType;
 
 import com.velasolaris.plugin.controller.spi.PluginControllerException;
 import com.velasolaris.plugin.controller.spi.PolysunSettings;
 
+/**
+ * MTODO Javadoc
+ *
+ */
 public class BatteryPreSimulatorSocket extends AbstractSingleComponentController {
 
 	/** Key for the IPreSimulatable battery component */
@@ -30,10 +36,10 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	private static final float MAX_FORECAST_HORIZON = 24.0f;
 	/** Number of arguments to the preSimulate() method */
 	private static final int NUM_PRESIMULATION_ARGS = 3;
-	
+
 	/** Arguments for pre-simulation */
 	private List<Object> mPreSimulationArgs = new ArrayList<Object>(NUM_PRESIMULATION_ARGS);
-	
+
 	public BatteryPreSimulatorSocket() throws PluginControllerException {
 		super();
 		setSendTimestamp(false); // Disable time stamp option
@@ -46,15 +52,15 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 	public String getName() {
 		return "Battery Presimulator Socket";
 	}
-	
+
 	@Override
 	public String getVersion() {
 		return "1.0 - prerelease";
 	}
-	
+
 	@Override
 	public String getDescription() {
-		return "Pre-simulates the battery and communicates with a BatteryModelServer or BatteryModelClient function block.";
+		return "Pre-simulates the battery and communicates with a PolysunBatteryModel function block on 4diac-RTE.";
 	}
 
 	@Override
@@ -68,8 +74,17 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 			boolean preRun, Map<String, Object> parameters) throws PluginControllerException {
 		try {
 			if (isPreSimulatableComponentAvailable(PRESIMULATABLE_BATTERY_KEY)) {
-				recvData();
-				if (getSocket().isDouble()) {
+				// Run in a loop until FORTE signals to stop.
+				boolean run = true;
+				while (run) {
+					recvData();
+					if (!getSocket().isBool()) {
+						throw new PluginControllerException(getName() + ": Expected BOOL data from FORTE.");
+					}
+					run = getSocket().getBool();
+					if (!getSocket().isDouble()) {
+						throw new PluginControllerException(getName() + ": Expected LREAL data from FORTE.");
+					}
 					getPreSimulationArgs().set(0, simulationTime);
 					double chargingEnergykWh = getSocket().getDouble();
 					// Convert energy in kWh to power in kW.
@@ -79,10 +94,9 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 					// Tell Polysun to pre-simulate battery.
 					List<Object> output = getPreSimulatableComponent(PRESIMULATABLE_BATTERY_KEY).preSimulate(getPreSimulationArgs());
 					// Send the result to FORTE.
+					getSocket().put(run);
 					getSocket().put((double) output.get(0));
 					sendData();
-				} else {
-					throw new PluginControllerException(getName() + ": Unexpected data type received from FORTE.");
 				}
 			} else {
 				throw new PluginControllerException(getName() + ": No battery component found.");
@@ -93,34 +107,33 @@ public class BatteryPreSimulatorSocket extends AbstractSingleComponentController
 		}
 		return null;
 	}
-	
+
 	@Override
 	public List<String> getPropertiesToHide(PolysunSettings propertyValues, Map<String, Object> parameters) {
 		List<String> propertiesToHide = super.getPropertiesToHide(propertyValues, parameters);
 		propertiesToHide.add(WAITFORRSP_KEY);
 		return propertiesToHide;
 	}
-	
+
 	@Override
 	protected List<Property> initialisePropertyList() {
 		List<Property> properties = super.initialisePropertyList();
-		properties.add(new Property(SERVICETYPE_KEY, new String[] { "BatteryModelClient", "BatteryModelServer" }, CLIENT_IDX, SERVICETYPE_TOOLTIP));
 		properties.add(new Property(FORECAST_HORIZON_KEY, DEF_FORECAST_HORIZON, MIN_FORECAST_HORIZON, MAX_FORECAST_HORIZON, "h", "The forecast horizon over which the battery is pre-simulated."));
 		return properties;
 	}
-	
+
 	@Override
 	protected void initialiseConnection(String address, int port) throws PluginControllerException {
 		CommLayerParams params = new CommLayerParams(address, port);
-		switch (getProp(SERVICETYPE_KEY).getInt()) { // Default is CLIENT
-		case SERVER_IDX:
-			params.setServiceType(ForteServiceType.SERVER);
-			break;
-		}
-		params.addInputOutput(ForteDataType.LREAL); // Output: Set power for battery charge/discharge
+		// Output: Indicator for breaking out of loop.
+		// Input: true if SIMIN event is to be sent in FORTE, false otherwise.
+		params.addInputOutput(ForteDataType.BOOL);
+		// Output: Power for battery charge/discharge pre-simulation.
+		// Input: Battery capacity after pre-simulation.
+		params.addInputOutput(ForteDataType.LREAL); 
 		makeIPSocket(params); // Create the socket and connect to FORTE
 	}
-	
+
 	/**
 	 * @return {@link #mPreSimulationArgs}
 	 */
