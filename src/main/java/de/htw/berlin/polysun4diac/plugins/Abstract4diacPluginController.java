@@ -66,7 +66,7 @@ public abstract class Abstract4diacPluginController extends AbstractPluginContro
 	
 	@Override
 	public String getVersion() {
-		return "1.0";
+		return "3.0";
 	}
 	
 	@Override
