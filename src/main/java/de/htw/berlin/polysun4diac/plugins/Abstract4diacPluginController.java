@@ -29,6 +29,7 @@ import de.htw.berlin.polysun4diac.forte.datatypes.DateAndTime;
  * @see de.htw.berlin.polysun4diac.forte.comm.CommLayerParams
  * @see de.htw.berlin.polysun4diac.forte.comm.IForteSocket
  * @see com.velasolaris.plugin.controller.spi.IPluginController
+ * @since Polysun 10.0
  */
 public abstract class Abstract4diacPluginController extends AbstractPluginController {
 

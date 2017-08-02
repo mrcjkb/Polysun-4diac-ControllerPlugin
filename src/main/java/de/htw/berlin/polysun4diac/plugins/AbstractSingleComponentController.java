@@ -18,6 +18,7 @@ import de.htw.berlin.polysun4diac.forte.comm.IForteSocket;
  * @see de.htw.berlin.polysun4diac.forte.comm.CommLayerParams
  * @see de.htw.berlin.polysun4diac.forte.comm.IForteSocket
  * @see com.velasolaris.plugin.controller.spi.IPluginController
+ * @since Polysun 10.0
  */
 public abstract class AbstractSingleComponentController extends Abstract4diacPluginController {
 	

@@ -12,7 +12,7 @@ import com.velasolaris.plugin.controller.spi.IPluginController;
 /**
  * Controller plugin for Polysun. Adds the actors and sensors necessary for communicating with 4diac-RTE (FORTE).
  * @author Marc Jakobi</p>HTW Berlin</p>July 2017
- *
+ * @since Polysun 10.0
  */
 public class ForteActorSensorPlugin extends AbstractControllerPlugin {
 

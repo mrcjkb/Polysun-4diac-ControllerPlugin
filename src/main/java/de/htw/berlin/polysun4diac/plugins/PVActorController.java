@@ -13,6 +13,15 @@ import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration.Contr
 import de.htw.berlin.polysun4diac.forte.comm.CommLayerParams;
 import de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType;
 
+/**
+ **
+ * Plugin controller for receiving the PV field's deratubg factor from 4diac-RTE (FORTE).
+ * @author Marc Jakobi</p>HTW Berlin</p>July 2017
+ * @see de.htw.berlin.polysun4diac.forte.comm.IForteSocket
+ * @see de.htw.berlin.polysun4diac.forte.comm.CommLayerParams
+ * @see com.velasolaris.plugin.controller.spi.IPluginController
+ * @since Polysun 10.0
+ */
 public class PVActorController extends AbstractActorController {
 
 	private static final String CSIGNAL1 = "Derating factor";

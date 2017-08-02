@@ -9,6 +9,7 @@ import com.velasolaris.plugin.controller.spi.PolysunSettings;
 /**
  * Defines the default behaviour of a FORTE actor plugin controller for receiving control signals from IEC 61499 applications running on 4diac-RTE (FORTE).
  * @author Marc Jakobi</p>HTW Berlin</p>July 2017
+ * @since Polysun 10.0
  */
 public abstract class AbstractActorController extends AbstractSingleComponentController {
 

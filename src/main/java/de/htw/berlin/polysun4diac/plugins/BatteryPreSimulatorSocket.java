@@ -26,6 +26,7 @@ import com.velasolaris.plugin.controller.spi.PolysunSettings;
  * @see de.htw.berlin.polysun4diac.forte.comm.IForteSocket
  * @see de.htw.berlin.polysun4diac.forte.comm.CommLayerParams
  * @see com.velasolaris.plugin.controller.spi.IPluginController
+ * @since Polysun 11.0
  */
 public class BatteryPreSimulatorSocket extends AbstractSingleComponentController {
 
