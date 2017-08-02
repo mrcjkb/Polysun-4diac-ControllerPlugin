@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.velasolaris.plugin.controller.spi.AbstractPluginController;
+import com.velasolaris.plugin.controller.spi.IOutputOverridable;
 import com.velasolaris.plugin.controller.spi.IPluginController;
 import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration;
 import com.velasolaris.plugin.controller.spi.PluginControllerException;
@@ -38,8 +39,7 @@ import de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType;
 public class SGReadyHeatPumpTest {
 
 	private static final String SENSOR1 = "Temperature of buffer storage.";
-	private static final String CSIGNAL1 = "Heat pump ON/OFF";
-	private static final String CSIGNAL2 = "Internal electric heating element ON/OFF";
+	private static final String CSIGNAL1 = "Internal electric heating element ON/OFF";
 	private static final String NAME = "SG Ready Heat Pump Adapter";
 	/** Precision for assertions of double/float data */
 	private static double PRECISION = 0.000001;
@@ -132,6 +132,7 @@ public class SGReadyHeatPumpTest {
 
 	private IPluginController controller;
 	private SGReadyEcho echo;
+	private IOutputOverridable testOverridable;
 	private boolean wait;
 	private boolean run = true;
 	private boolean[] echoSensors = new boolean[NUM_RELAYS];
@@ -157,8 +158,7 @@ public class SGReadyHeatPumpTest {
 		sensors.add(new Sensor(SENSOR1, "°C", true, true, true));
 
 		List<ControlSignal> controlSignals = new ArrayList<>();
-		controlSignals.add(new ControlSignal(CSIGNAL1, "", false, true, true));
-		controlSignals.add(new ControlSignal(CSIGNAL2, "", false, false, true));
+		controlSignals.add(new ControlSignal(CSIGNAL1, "", false, false, true));
 
 		List<Log> logs = new ArrayList<>();
 
@@ -203,7 +203,7 @@ public class SGReadyHeatPumpTest {
 		for (ControlSignal controlSignal : configuration.getControlSignals()) {
 			controlSignals.add(new ControlSignal(controlSignal.getName(), controlSignal.getUnit(),
 					controlSignal.isAnalog(), controlSignal.isRequired(),
-					CSIGNAL1.equals(controlSignal.getName()) || CSIGNAL2.equals(controlSignal.getName())));
+					CSIGNAL1.equals(controlSignal.getName())));
 		}
 
 		List<Log> logs = new ArrayList<>();
@@ -227,7 +227,7 @@ public class SGReadyHeatPumpTest {
 	synchronized void setRun(boolean tf) {
 		run = tf;
 	}
-	
+
 	/**
 	 * @param tf1 <code>true</code> to release wait in echo Thread
 	 * @param tf2 <code>true</code> if Thread should stop execution after the next one.
@@ -289,6 +289,8 @@ public class SGReadyHeatPumpTest {
 	public void setUp() throws Exception {
 		controller = new SGReadyHeatPumpController();
 		echo = new SGReadyEcho();
+		testOverridable = new TestOverridable();
+		controller.addOverridableController(testOverridable.getUserDescription(), testOverridable);
 	}
 
 	@After
@@ -307,7 +309,7 @@ public class SGReadyHeatPumpTest {
 		assertEquals("Wrong number of generic properties", 0, configuration.getNumGenericProperties());
 		assertEquals("Wrong number of configured sensors", 1, configuration.getSensors().size());
 		assertEquals("Wrong number of generic sensors", 0, configuration.getNumGenericSensors());
-		assertEquals("Wrong number of configured controlSignals", 2, configuration.getControlSignals().size());
+		assertEquals("Wrong number of configured controlSignals", 1, configuration.getControlSignals().size());
 		assertEquals("Wrong number of generic controlSignals", 0, configuration.getNumGenericControlSignals());
 		assertEquals("Wrong number of logs", 0, configuration.getLogs().size());
 		assertEquals("Wrong controller image", getPluginIconResource(), configuration.getImagePath());
@@ -418,16 +420,11 @@ public class SGReadyHeatPumpTest {
 		controller.build(createPolysunSettingsDefaultConfiguration(), null);
 		assertEquals("Wrong property name returned", HOST_KEY,
 				((AbstractPluginController) controller).getProperty(HOST_KEY).getName());
-		assertEquals("Wrong sensor name returned", CSIGNAL1,
-				((AbstractPluginController) controller).getControlSignal(CSIGNAL1).getName());
 
 		assertEquals("Inexistent property failed", null, ((AbstractPluginController) controller).getProperty("XXX"));
 		assertEquals("Inexistent property failed", null, ((AbstractPluginController) controller).getSensor("XXX"));
 		assertEquals("Inexistent property failed", null,
 				((AbstractPluginController) controller).getControlSignal("XXX"));
-
-		assertEquals("Wrong control signal index returned", 0,
-				((AbstractPluginController) controller).getControlSignalIndex(CSIGNAL1));
 
 		assertEquals("Wrong sensor index returned", -1, ((AbstractPluginController) controller).getSensorIndex("XXX"));
 		assertEquals("Wrong control signal index returned", -1,
@@ -437,7 +434,7 @@ public class SGReadyHeatPumpTest {
 	@Test
 	public void testNormalControlMode() throws Exception {
 		float[] sensors = new float[] {0};
-		float[] controlSignals = new float[2];
+		float[] controlSignals = new float[] {0};
 		float[] logValues = new float[3];
 		int simulationTime = 0;
 		// Test NORMAL control mode
@@ -448,9 +445,8 @@ public class SGReadyHeatPumpTest {
 		controller.initialiseSimulation(null);
 		setWait(false);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Wrong control signal " + Integer.toString(i), MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Wrong control signal 0", MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Wrong control signal 1", MODE2[1], controlSignals[0], PRECISION);
 		controller.terminateSimulation(null);
 		echo.disconnect();
 	}
@@ -459,7 +455,7 @@ public class SGReadyHeatPumpTest {
 	public void testOffControlMode() throws Exception {
 		setWait(false);
 		float[] sensors = new float[] {0};
-		float[] controlSignals = new float[2];
+		float[] controlSignals = new float[] {0};
 		float[] logValues = new float[3];
 		int simulationTime = 0;
 		// Test OFF control mode.
@@ -470,9 +466,8 @@ public class SGReadyHeatPumpTest {
 		controller.initialiseSimulation(null);
 		setWait(false);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Wrong control signal 1: " + Integer.toString(i), MODE1[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Wrong control signal 0", MODE1[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Wrong control signal 1", MODE1[1], controlSignals[0], PRECISION);
 		// Test 2 hour time limitation of OFF operation
 		simulationTime += OFF_TIME_LIM_S + 1;
 		setWait(false); // Unlock echo Thread
@@ -486,37 +481,35 @@ public class SGReadyHeatPumpTest {
 		setEchoSensors(false, false); // NORMAL mode (2)
 		setWait(false);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Wrong control signal 2: " + Integer.toString(i), MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Wrong control signal 0", MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Wrong control signal 1", MODE2[1], controlSignals[0], PRECISION);
 		// Test switching back to OFF mode within cool down period
 		simulationTime += 1;
 		setEchoSensors(true, false); // OFF mode (1)
 		setWait(false);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Maintaining NORMAL operation after switching"
-					+ " back to OFF from other control mode within cool donwn period failed: "
-					+ Integer.toString(i), controlSignals[i], MODE2[i], PRECISION);
-		}
+		assertEquals("Maintaining NORMAL operation after switching"
+				+ " back to OFF from other control mode within cool donwn period failed.", MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Maintaining NORMAL operation after switching"
+				+ " back to OFF from other control mode within cool donwn period failed.", controlSignals[0], MODE2[1], PRECISION);
 		// Test time limitation cool down
 		simulationTime += OFF_TIME_HYSTERESIS_S;
 		setWaitRun(false, false);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Allowing OFF operation "
-					+ "after cool down period failed: " + Integer.toString(i), MODE1[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Allowing OFF operation "
+				+ "after cool down period failed.", MODE1[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Allowing OFF operation "
+				+ "after cool down period failed.", MODE1[1], controlSignals[0], PRECISION);
 		echo.join();
 		controller.terminateSimulation(null);
 		echo.disconnect();
 	}
-	
+
 	@Test
 	public void testDefaultAmplifiedControlMode() throws Exception {
 		setWait(false);
 		float[] sensors = new float[] {0};
-		float[] controlSignals = new float[2];
+		float[] controlSignals = new float[] {0};
 		float[] logValues = new float[3];
 		int simulationTime = 0;
 		// Test AMPLIFIED control mode.
@@ -527,55 +520,60 @@ public class SGReadyHeatPumpTest {
 		controller.initialiseSimulation(null);
 		setWait(false);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Wrong control signal 1: " + Integer.toString(i), MODE3_NOAUX[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Wrong control signal 0", MODE3_NOAUX[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Wrong control signal 1", MODE3_NOAUX[1], controlSignals[0], PRECISION);
 		// Test behaviour when temperature exceeds threshold
 		sensors[0] = DEF_TEMP_THRESHOLDS[0] + 1;
 		controlSignals[0] = MODE2[0];
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Forcing NORMAL operation when "
-					+ "temperature exceeds threshold failed.", MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Forcing NORMAL operation when "
+				+ "temperature exceeds threshold failed.", MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Forcing NORMAL operation when "
+				+ "temperature exceeds threshold failed.", MODE2[1], controlSignals[0], PRECISION);
 		// Test behaviour when temperature is below threshold, but above hysteresis
 		sensors[0] = DEF_TEMP_THRESHOLDS[0] - DEF_TEMP_HYSTERESIS / 2;
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Maintaining NORMAL operation when "
-					+ "temperature falls back below threshold "
-					+ "but not below hysteresis failed.", MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Maintaining NORMAL operation when "
+				+ "temperature falls back below threshold "
+				+ "but not below hysteresis failed.", MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Maintaining NORMAL operation when "
+				+ "temperature falls back below threshold "
+				+ "but not below hysteresis failed.", MODE2[1], controlSignals[0], PRECISION);
 		// Switch to different control mode
 		setEchoSensors(false, false); // NORMAL mode (2)
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Wrong control signal 2: " + Integer.toString(i), MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Wrong control signal 2", MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Wrong control signal 2", MODE2[1], controlSignals[0], PRECISION);
 		// Test switching back to OFF mode within cool down period
 		setEchoSensors(false, true); // AMPLIFIED mode (1)
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Maintaining NORMAL operation after switching "
-					+ "back to OFF from other control mode "
-					+ "while still within hysteresis zone failed: "
-					+ Integer.toString(i), MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Maintaining NORMAL operation after switching "
+				+ "back to OFF from other control mode "
+				+ "while still within hysteresis zone failed.",
+				MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Maintaining NORMAL operation after switching "
+				+ "back to OFF from other control mode "
+				+ "while still within hysteresis zone failed.",
+				MODE2[1], controlSignals[0], PRECISION);
 		// Test allowing AMPLIFIED mode when temperature falls back below hysteresis
 		sensors[0] = DEF_TEMP_THRESHOLDS[0] - DEF_TEMP_HYSTERESIS - 1;
 		setWaitRun(false, false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Allowing AMPLIFIED mode when temperature "
-					+ "falls back below hysteresis failed: "
-					+ Integer.toString(i), MODE3_NOAUX[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Allowing AMPLIFIED mode when temperature "
+				+ "falls back below hysteresis failed: ", MODE3_NOAUX[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Allowing AMPLIFIED mode when temperature "
+				+ "falls back below hysteresis failed: ", MODE3_NOAUX[1], controlSignals[0], PRECISION);
 	}
-	
+
 	@Test
 	public void testDefaultOnMaxControlMode() throws Exception {
 		setWait(false);
@@ -590,56 +588,63 @@ public class SGReadyHeatPumpTest {
 		Thread.sleep(THREAD_SLEEP_TIME); // Give echo time to open connection
 		controller.initialiseSimulation(null);
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Wrong control signal 1: " + Integer.toString(i), MODE4_AUX[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Wrong control signal 1.", MODE4_AUX[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Wrong control signal 1.", MODE4_AUX[1], controlSignals[0], PRECISION);
 		// Test behaviour when temperature exceeds threshold
 		sensors[0] = DEF_TEMP_THRESHOLDS[1] + 1;
 		controlSignals[0] = MODE2[0];
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Forcing NORMAL operation when "
-					+ "temperature exceeds threshold failed.", MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Forcing NORMAL operation when "
+				+ "temperature exceeds threshold failed.", MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Forcing NORMAL operation when "
+				+ "temperature exceeds threshold failed.", MODE2[1], controlSignals[0], PRECISION);
 		// Test behaviour when temperature is below threshold, but above hysteresis
 		sensors[0] = DEF_TEMP_THRESHOLDS[1] - DEF_TEMP_HYSTERESIS / 2;
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Maintaining NORMAL operation when "
-					+ "temperature falls back below threshold "
-					+ "but not below hysteresis failed.", MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Maintaining NORMAL operation when "
+				+ "temperature falls back below threshold "
+				+ "but not below hysteresis failed.", MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Maintaining NORMAL operation when "
+				+ "temperature falls back below threshold "
+				+ "but not below hysteresis failed.", MODE2[1], controlSignals[0], PRECISION);
 		// Switch to different control mode
 		setEchoSensors(false, false); // NORMAL mode (2)
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Wrong control signal 2: " + Integer.toString(i), MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Wrong control signal 2.", MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		// Test switching back to OFF mode within cool down period
+		assertEquals("Wrong control signal 2.", MODE2[1], controlSignals[0], PRECISION);
 		// Test switching back to OFF mode within cool down period
 		setEchoSensors(true, true); // ONMAX mode (1)
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Maintaining NORMAL operation after switching "
-					+ "back to OFF from other control mode "
-					+ "while still within hysteresis zone failed: "
-					+ Integer.toString(i), MODE2[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Maintaining NORMAL operation after switching "
+				+ "back to OFF from other control mode "
+				+ "while still within hysteresis zone failed.",
+				 MODE2[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Maintaining NORMAL operation after switching "
+				+ "back to OFF from other control mode "
+				+ "while still within hysteresis zone failed.",
+				 MODE2[1], controlSignals[0], PRECISION);
 		// Test allowing ONMAX mode when temperature falls back below hysteresis
 		sensors[0] = DEF_TEMP_THRESHOLDS[1] - DEF_TEMP_HYSTERESIS - 1;
 		setWaitRun(false, false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Allowing ONMAX/AMPLIFIED+ mode when temperature "
-					+ "falls back below hysteresis failed: "
-					+ Integer.toString(i), MODE4_AUX[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Allowing ONMAX/AMPLIFIED+ mode when temperature "
+				+ "falls back below hysteresis failed.", MODE4_AUX[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Allowing ONMAX/AMPLIFIED+ mode when temperature "
+				+ "falls back below hysteresis failed.", MODE4_AUX[1], controlSignals[0], PRECISION);
 	}
-	
+
 	@Test
 	public void testAmplifiedWithAuxiliaryHeaterControlMode() throws Exception {
 		setWait(false);
@@ -655,12 +660,12 @@ public class SGReadyHeatPumpTest {
 		Thread.sleep(THREAD_SLEEP_TIME); // Give echo time to open connection
 		controller.initialiseSimulation(null);
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Wrong control signal 1: " + Integer.toString(i), MODE3_AUX[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Wrong control signal 1.", MODE3_AUX[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Wrong control signal 1.", MODE3_AUX[1], controlSignals[0], PRECISION);
 	}
-	
+
 	@Test
 	public void testOnMaxWithoutAuxiliaryHeaterControlMode() throws Exception {
 		setWait(false);
@@ -676,10 +681,10 @@ public class SGReadyHeatPumpTest {
 		Thread.sleep(200); // Give echo time to open connection
 		controller.initialiseSimulation(null);
 		setWait(false);
+		testOverridable.overrideControlSignals(new float[2]);
 		controller.control(simulationTime,  true,  sensors,  controlSignals,  logValues, false, null);
-		for (int i = 0; i < controlSignals.length; i++) {
-			assertEquals("Wrong control signal 1: " + Integer.toString(i), MODE4_NOAUX[i], controlSignals[i], PRECISION);
-		}
+		assertEquals("Wrong control signal.", MODE4_NOAUX[0], testOverridable.getControlSignals()[0], PRECISION);
+		assertEquals("Wrong control signal.", MODE4_NOAUX[1], controlSignals[0], PRECISION);
 	}
 
 	/**
@@ -716,6 +721,35 @@ public class SGReadyHeatPumpTest {
 				e.printStackTrace();
 				disconnect();
 				fail("IOException");
+			}
+		}
+	}
+
+	public class TestOverridable implements IOutputOverridable {
+		private float[] mControlSignals = new float[2];
+
+		@Override
+		public boolean isOverridable() {
+			return true;
+		}
+
+		@Override
+		public String getUserDescription() {
+			return "NORMALMODE";
+		}
+
+		@Override
+		public float[] getControlSignals() {
+			return mControlSignals;
+		}
+
+		@Override
+		public void overrideControlSignals(float[] controlSignals) throws PluginControllerException {
+			if (controlSignals.length != mControlSignals.length) {
+				throw new PluginControllerException("Length mismatch");
+			}
+			for (int i = 0; i < mControlSignals.length; i++) {
+				mControlSignals[i] = controlSignals[i];
 			}
 		}
 	}

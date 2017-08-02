@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.velasolaris.plugin.controller.spi.IOutputOverridable;
 import com.velasolaris.plugin.controller.spi.PluginControllerConfiguration;
 import com.velasolaris.plugin.controller.spi.PluginControllerException;
 import com.velasolaris.plugin.controller.spi.PolysunSettings;
@@ -31,8 +32,9 @@ import de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType;
 public class SGReadyHeatPumpController extends AbstractSingleComponentController {
 
 	private static final String SENSOR1 = "Temperature of buffer storage.";
-	private static final String CSIGNAL1 = "Heat pump ON/OFF";
-	private static final String CSIGNAL2 = "Internal electric heating element ON/OFF";
+	private static final String CSIGNAL1 = "Internal electric heating element ON/OFF";
+	/** Key that must be entered into the Description box of the controller that performs the normal mode operation */
+	private static final String OVERRIDDEN_CONTROLLER_KEY = "NORMALMODE";
 	/** Default temperature thresholds at which the heat pump switches from SG Ready modes 3/4 to 2. */
 	private static final float[] DEF_TEMP_THRESHOLDS = new float[] {55, 70};
 	/** The upper and lower limits for {@link #DEF_TEMP_THRESHOLDS} */
@@ -123,6 +125,8 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 	private boolean mForcedNormalOperation = false;
 	/** Flag indicating that normal operation has been forced even though control mode 1 was set. */
 	private boolean mForcedOnOperation = false;
+	/** Controller that performs the normal mode operation */
+	private IOutputOverridable mNormalModeController;
 
 	public SGReadyHeatPumpController() throws PluginControllerException {
 		super();
@@ -144,14 +148,14 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 		return "Actor for receiving the heat pump's SG Ready control mode from 4diac-RTE (FORTE). "
 				+ "This controller acts as an adapter between the SG ready control modes and Polysun's heat pump control modes. It overrides the setting of a heating controller "
 				+ "and must be place in the GUI AFTER the heating controller is placed. "
+				+ "The heating controller's description must be set to " + OVERRIDDEN_CONTROLLER_KEY + " for it to be recognized."
 				+ "This plugin controller is a prerelease! It does not currently work as intended with Polysun 10. It will work with Polysun 11.";
 	}
 
 	@Override
 	public PluginControllerConfiguration getConfiguration(Map<String, Object> parameters) {
 		List<ControlSignal> controlSignals = new ArrayList<>();
-		controlSignals.add(new ControlSignal(CSIGNAL1, "", false, true, "The heat pump's on/off switch."));
-		controlSignals.add(new ControlSignal(CSIGNAL2, "", false, false, "The internal electric heating element's on/off switch."));
+		controlSignals.add(new ControlSignal(CSIGNAL1, "", false, false, "The internal electric heating element's on/off switch."));
 		List<Sensor> sensors = new ArrayList<>();
 		sensors.add(new Sensor(SENSOR1, "°C", true, true, "The temperature in the storage tank."));
 		return new PluginControllerConfiguration(initialisePropertyList(), sensors, controlSignals, null, 0, 0, 0, getPluginIconResource(), null);
@@ -176,7 +180,7 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 		PropertyValue property4 = propertyValues.getPropertyValue(HEATING_ELEMENT4_KEY);
 		if (property3 != null && property4 != null
 				&& property3.getInt() == HAS_NO_HEATING_ELEMENT && property4.getInt() == HAS_NO_HEATING_ELEMENT) {
-			controlSignalsToHide.add(CSIGNAL2);
+			controlSignalsToHide.add(CSIGNAL1);
 		}
 		return controlSignalsToHide;
 	}
@@ -196,6 +200,11 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 		}
 		setTempThresholds(getProperty(TEMP_THRESHOLD3_KEY).getFloat(), getProperty(TEMP_THRESHOLD4_KEY).getFloat());
 		setTempHysteresis(getProperty(TEMP_HYSTERESIS_KEY).getFloat());
+		if (!isOverridableControllerAvailable(OVERRIDDEN_CONTROLLER_KEY)) {
+			throw new PluginControllerException(getName() + " No heating controller found. Please set the Description of the heating controller that performs"
+					+ " the normal operation to " + OVERRIDDEN_CONTROLLER_KEY);
+		}
+		mNormalModeController = getOverridableController(OVERRIDDEN_CONTROLLER_KEY);
 	}
 
 	@Override
@@ -211,8 +220,8 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 	public int[] control(int simulationTime, boolean status, float[] sensors, float[] controlSignals, float[] logValues,
 			boolean preRun, Map<String, Object> parameters) throws PluginControllerException {
 		// Initialise NORMAL operation
-		mSGReadyMode2[0] = controlSignals[0]; // The initial value of controlSignals[] is set by the previous controller.
-		mSGReadyMode2[1] = controlSignals[1];
+		float[] normalModeSignals = mNormalModeController.getControlSignals();
+		mSGReadyMode2[0] = normalModeSignals[0]; // The initial value of controlSignals[] is set by the previous controller.
 		if (!status) {
 			return null;
 		}
@@ -224,7 +233,7 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 				if (getSocket().isBool()) {
 					sgReadySignals[i] = getSocket().getBool();
 				} else {
-					throw new PluginControllerException(getName() + ": The battery actor function block should send BOOL data as a " + CSIGNAL1 + " control signal.");
+					throw new PluginControllerException(getName() + ": The battery actor function block should send BOOL data as a control signal.");
 				}
 			}
 			// Allow OFF operation again if cool down time for disallowing OFF operation has been exceeded.
@@ -247,8 +256,60 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 			}
 			// Pass the corresponding Polysun control signals.
 			float[] polysunSignals = sgready2polysun(sgReadyIntSignal);
-			controlSignals[getCSIdx(CSIGNAL1)] = polysunSignals[0];
-			controlSignals[getCSIdx(CSIGNAL2)] = polysunSignals[1];
+			controlSignals[getCSIdx(CSIGNAL1)] = polysunSignals[1];
+			normalModeSignals[0] = polysunSignals[0];
+			mNormalModeController.overrideControlSignals(normalModeSignals);
+			return null;
+		} catch (PluginControllerException e) {
+			disconnect();
+			throw e;
+		}
+	}
+	
+	/**
+	 * A slightly modified version of the @{link {@link #control(int, boolean, float[], float[], float[], boolean, Map)} method for use in JUnit tests.
+	 * It does not over
+	 */
+	public int[] controlTest(int simulationTime, boolean status, float[] sensors, float[] controlSignals, float[] logValues,
+			boolean preRun, Map<String, Object> parameters) throws PluginControllerException {
+		// Initialise NORMAL operation
+		mSGReadyMode2[0] = controlSignals[0];
+		if (!status) {
+			return null;
+		}
+		try {
+			recvData();
+			// Read control signals from buffer
+			boolean[] sgReadySignals = new boolean[2];
+			for (int i = 0; i < NUM_RELAYS; i++) {
+				if (getSocket().isBool()) {
+					sgReadySignals[i] = getSocket().getBool();
+				} else {
+					throw new PluginControllerException(getName() + ": The battery actor function block should send BOOL data as a control signal.");
+				}
+			}
+			// Allow OFF operation again if cool down time for disallowing OFF operation has been exceeded.
+			if (isForcedOnOperation() && simulationTime - getOffOperationBeginTimeS() >= OFF_TIME_LIM_S + OFF_TIME_HYSTERESIS_S) {
+				setForcedOnOperation(false);
+				setOffOperationBeginTimeS(INIT_OFFOPERATIONBEGINTIME_S);
+			}
+			// Analyse control signals and implement automatic control of the SG Ready control modes.
+			int sgReadyIntSignal = sgready2Int(sgReadySignals);
+			switch (sgReadyIntSignal) {
+			case OFF_OPERATION:
+				sgReadyIntSignal = controlOffOperation(simulationTime);
+				break;
+			case AMPLIFIED_OPERATION:
+				sgReadyIntSignal = controlAutoControlledOperation(getSensor(SENSOR1, sensors), AutoControlledControlMode.AMPLIFIED);
+				break;
+			case ONMAX_OPERATION:
+				sgReadyIntSignal = controlAutoControlledOperation(getSensor(SENSOR1, sensors), AutoControlledControlMode.ONMAX);
+				break;
+			}
+			// Pass the corresponding Polysun control signals.
+			float[] polysunSignals = sgready2polysun(sgReadyIntSignal);
+			controlSignals[getCSIdx(CSIGNAL1)] = polysunSignals[1];
+			controlSignals[1] = polysunSignals[0];
 			return null;
 		} catch (PluginControllerException e) {
 			disconnect();
