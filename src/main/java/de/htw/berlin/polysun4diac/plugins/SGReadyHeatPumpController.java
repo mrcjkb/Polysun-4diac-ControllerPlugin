@@ -153,7 +153,7 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 		controlSignals.add(new ControlSignal(CSIGNAL1, "", false, true, "The heat pump's on/off switch."));
 		controlSignals.add(new ControlSignal(CSIGNAL2, "", false, false, "The internal electric heating element's on/off switch."));
 		List<Sensor> sensors = new ArrayList<>();
-		sensors.add(new Sensor(SENSOR1, "°C", true, false, "The AC power output of the PV field."));
+		sensors.add(new Sensor(SENSOR1, "°C", true, true, "The temperature in the storage tank."));
 		return new PluginControllerConfiguration(initialisePropertyList(), sensors, controlSignals, null, 0, 0, 0, getPluginIconResource(), null);
 	}
 
