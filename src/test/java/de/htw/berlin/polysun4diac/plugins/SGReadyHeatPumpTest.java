@@ -154,7 +154,7 @@ public class SGReadyHeatPumpTest {
 		properties.add(new PropertyValue(TEMP_HYSTERESIS_KEY, tempHysteresis, "K"));
 
 		List<Sensor> sensors = new ArrayList<>();
-		sensors.add(new Sensor(SENSOR1, "°C", true, false, true));
+		sensors.add(new Sensor(SENSOR1, "°C", true, true, true));
 
 		List<ControlSignal> controlSignals = new ArrayList<>();
 		controlSignals.add(new ControlSignal(CSIGNAL1, "", false, true, true));
