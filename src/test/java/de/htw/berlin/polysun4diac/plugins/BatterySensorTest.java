@@ -253,7 +253,7 @@ public class BatterySensorTest {
 		controller.control(simulationTime, true, sensors, controlSignals, logValues, false, null);
 		echo.join();
 		assertEquals("Wrong value sent 1", sensors[0], echo.getReceivedData()[0], PRECISION);
-		assertEquals("Wrong value sent 2", sensors[1], echo.getReceivedData()[1], PRECISION);
+		assertEquals("Wrong value sent 2", sensors[1] * (-1), echo.getReceivedData()[1], PRECISION);
 		controller.terminateSimulation(null);
 	}
 }

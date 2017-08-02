@@ -1,7 +1,7 @@
 Testsuite: de.htw.berlin.polysun4diac.forte.comm.IPCommLayerTest
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.079 sec
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.073 sec
 
-Testcase: testCreateServer took 0 sec
+Testcase: testCreateServer took 0.005 sec
 Testcase: testCreateSubscriber took 0 sec
 Testcase: testCreatePublisher took 0 sec
 Testcase: testCreateClient took 0 sec
