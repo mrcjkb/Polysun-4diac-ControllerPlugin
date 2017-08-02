@@ -1,4 +1,4 @@
 Testsuite: de.htw.berlin.polysun4diac.forte.comm.TCPTest
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.263 sec
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.268 sec
 
-Testcase: echoTest took 0.216 sec
+Testcase: echoTest took 0.211 sec

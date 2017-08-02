@@ -36,7 +36,7 @@ public class BatterySensorController extends AbstractSensorController {
 	
 	@Override
 	public String getDescription() {
-		return "Sensor for sending the battery's state of charge and last transferred power to 4diac-RTE (FORTE).";
+		return "Sensor for sending the battery's state of charge and last transferred power (positive = charge, negative = discharge) to 4diac-RTE (FORTE).";
 	}
 
 	@Override
@@ -73,6 +73,8 @@ public class BatterySensorController extends AbstractSensorController {
 	@Override
 	protected void putSensors(float[] sensors) {
 		getSocket().put((double) getSensor(SENSOR1, sensors));
-		getSocket().put((double) getSensor(SENSOR2, sensors));
+		// Currently, Polysun sends positive power as the discharging power and negative power as the charging power for the battery transfer.
+		// This plugin reverses the sign to be in accordance with the sign of the BatteryActorController's output.
+		getSocket().put((double) getSensor(SENSOR2, sensors) * (-1)); 
 	}
 }
