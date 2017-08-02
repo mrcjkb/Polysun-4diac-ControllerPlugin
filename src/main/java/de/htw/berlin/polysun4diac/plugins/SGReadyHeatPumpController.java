@@ -212,6 +212,7 @@ public class SGReadyHeatPumpController extends AbstractSingleComponentController
 			boolean preRun, Map<String, Object> parameters) throws PluginControllerException {
 		// Initialise NORMAL operation
 		mSGReadyMode2[0] = controlSignals[0]; // The initial value of controlSignals[] is set by the previous controller.
+		mSGReadyMode2[1] = controlSignals[1];
 		if (!status) {
 			return null;
 		}
