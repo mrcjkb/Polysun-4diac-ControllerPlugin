@@ -9,7 +9,7 @@ import de.htw.berlin.polysun4diac.forte.datatypes.ForteDataType;
 
 /**
  * Abstract class that combines the ICommunicationLayer and IForteSocket interfaces into one interface.
- * It also adds an abstract {@link #initialise(List, List)} method used to initialise the data types.
+ * It also adds an abstract {@link #initialize(List, List)} method used to initialize the data types.
  * @author Marc Jakobi</p>HTW Berlin</p>July 2017
  * @see IForteSocket
  * @see ICommunicationLayer
@@ -201,5 +201,5 @@ public abstract class AbstractDataBufferLayer extends AbstractCommunicationLayer
 	 * @param arraySizes <code>List</code> containing the corresponding array sizes (1 for non-arrays)
 	 * This could be the array sizes set in a CommLayerParams object.
 	 */
-	public abstract void initialise(List<Enum<?>> dataTypes, List<Integer> arraySizes);
+	public abstract void initialize(List<Enum<?>> dataTypes, List<Integer> arraySizes);
 }

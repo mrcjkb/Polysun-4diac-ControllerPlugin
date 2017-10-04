@@ -362,8 +362,8 @@ public class CommFunctionBlockLayer extends AbstractCommunicationLayer implement
 			setConnectionState(getBelow().openConnection(params));
 			setIntermediateLayerConnectionstate();
 			// Initialize intermediate layers
-			getInputLayer().initialise(params.getInputs(), params.getInputArrayLengths());
-			getOutputLayer().initialise(params.getOutputs(), params.getOutputArrayLengths());
+			getInputLayer().initialize(params.getInputs(), params.getInputArrayLengths());
+			getOutputLayer().initialize(params.getOutputs(), params.getOutputArrayLengths());
 		}
 		return getConnectionState();
 	}

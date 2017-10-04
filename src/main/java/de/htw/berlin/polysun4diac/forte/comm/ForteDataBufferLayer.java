@@ -100,7 +100,7 @@ public class ForteDataBufferLayer extends AbstractDataBufferLayer implements IFo
 		if (!isInitialized()) { // Object has not yet been initialized
 			// --> This is the top layer with the same inputs as outputs.
 			// Initialize with inputs defined in params
-			initialise(params.getInputs(), params.getInputArrayLengths());
+			initialize(params.getInputs(), params.getInputArrayLengths());
 		}
 		return super.openConnection(params);
 	}
@@ -114,7 +114,7 @@ public class ForteDataBufferLayer extends AbstractDataBufferLayer implements IFo
 	 * @see ForteDataType
 	 */
 	@Override
-	public void initialise(List<Enum<?>> dataTypes, List<Integer> arraySizes) {
+	public void initialize(List<Enum<?>> dataTypes, List<Integer> arraySizes) {
 		if (dataTypes.size() != arraySizes.size()) {
 			throw new InputMismatchException("The sizes of the inputs do not match.");
 		}
